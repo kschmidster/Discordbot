@@ -1,21 +1,27 @@
-package ch.kschmidster.kschmidsterbot.discord.listeners;
+package ch.kschmidster.kschmidsterbot.discord.handler;
 
 import java.util.Collection;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
+import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
+import ch.kschmidster.kschmidsterbot.discord.core.handler.MessageReceivedHandler;
 import ch.kschmidster.kschmidsterbot.discord.main.Main;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class LinkPostedListener extends ListenerAdapter {
+public class LinkPostedHandler implements MessageReceivedHandler {
 
 	@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
+	public void register(Collection<IHandler> handles) {
+		handles.add(this);
+	}
+
+	@Override
+	public void handleMessageReceived(MessageReceivedEvent event) {
 		if(hasRole(event.getMember(), Main.ROLE_UNICORN) || hasNoRole(event.getMember())) {
 			String contentDisplay = event.getMessage().getContentDisplay();
 			String content[] = contentDisplay.split(" ");
