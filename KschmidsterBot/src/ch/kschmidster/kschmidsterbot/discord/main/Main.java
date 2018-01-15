@@ -1,7 +1,10 @@
 package ch.kschmidster.kschmidsterbot.discord.main;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import ch.kschmidster.kschmidsterbot.discord.handler.LinkPostedHandler;
-import ch.kschmidster.kschmidsterbot.discord.handler.NewGuildMemberHandler;
+import ch.kschmidster.kschmidsterbot.discord.handler.NewGuildMemberJoinHandler;
 import ch.kschmidster.kschmidsterbot.discord.handler.ShutdownHandler;
 import ch.kschmidster.kschmidsterbot.discord.listeners.MyListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
@@ -9,6 +12,8 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 
 public class Main {
+	private static final Log LOG = LogFactory.getLog(Main.class);
+
 	// TODO maybe better handling of those consts
 	public static final String ROOT = "kschmidster";
 
@@ -19,32 +24,46 @@ public class Main {
 	public static final int LAST_MESSAGES = 10;
 
 	public static void main(String[] args) {
-		addListerner(getJda(AccountType.BOT, retriveToken(args)));
+		LOG.info("Starting up kschmidsterbot for discord ...");
+		addListerner(setUpJda(AccountType.BOT, retriveToken(args)));
+		LOG.info("Kschmidsterbot for discord is up and running :D");
 	}
 
 	private static String retriveToken(String[] args) {
+		LOG.debug("Retrieving discord token ...");
 		if (args == null || args.length == 0) {
-			throw new IllegalArgumentException("Discord token as program argument needed!");
+			IllegalArgumentException exception = new IllegalArgumentException("Discord token as program argument needed!");
+			LOG.fatal("Token not found!", exception);
+			throw exception;
 		}
+		LOG.debug("Retrieved discord token");
 		return args[0];
 	}
 
-	private static JDA getJda(AccountType accountType, String token) {
+	private static JDA setUpJda(AccountType accountType, String token) {
+		LOG.info("Setting up the JDA ...");
 		try {
-			return new JDABuilder(accountType).setToken(token).buildBlocking();
+			JDA jda = new JDABuilder(accountType).setToken(token).buildBlocking();
+			LOG.info("Done setting up JDA");
+			return jda;
 		} catch (Throwable t) {
-			throw new IllegalStateException("Could not initialize JDA");
+			String message = "Could not initialize JDA";
+			IllegalStateException exception = new IllegalStateException(message);
+			LOG.fatal(message, exception);
+			throw exception;
 		}
 	}
 
 	private static void addListerner(JDA jda) {
+		LOG.info("Add Listener");
 		MyListenerAdapter myListenerAdapter = new MyListenerAdapter();
 		jda.addEventListener(myListenerAdapter);
 		addHandles(myListenerAdapter);
 	}
 
 	private static void addHandles(MyListenerAdapter myListenerAdapter) {
-		myListenerAdapter.registerHandle(new NewGuildMemberHandler());
+		LOG.info("Register all handles");
+		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler());
 		myListenerAdapter.registerHandle(new LinkPostedHandler());
 		myListenerAdapter.registerHandle(new ShutdownHandler());
 	}
