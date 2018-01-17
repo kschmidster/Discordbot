@@ -18,6 +18,7 @@ public class Main {
 	public static final String ROOT = "kschmidster";
 
 	public static final String TEXT_CHANNEL_UNICORN_TREFF = "unicorn-treff";
+	public static final String TEXT_CHANNEL_ZEIT_FUER_CLIPS = "zeitfuerclips";
 	public static final String ROLE_UNICORN = "Unicorn";
 	public static final String GUILD_SPACE_UNICORN = "Space Unicorns";
 

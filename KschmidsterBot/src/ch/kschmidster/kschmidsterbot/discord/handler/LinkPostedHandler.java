@@ -28,7 +28,8 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	public void handleEvent(MessageReceivedEvent event) {
 		String message = event.getMessage().getContentDisplay();
 		LOG.info("Handle Message from " + event.getAuthor().getName() + ": " + message);
-		if (hasRole(event.getMember(), Main.ROLE_UNICORN) || hasNoRole(event.getMember())) {
+		if (isNotInChannel(event.getChannel(), Main.TEXT_CHANNEL_ZEIT_FUER_CLIPS)
+				&& (hasRole(event.getMember(), Main.ROLE_UNICORN) || hasNoRole(event.getMember()))) {
 			LOG.info("Handle message");
 			String content[] = message.split(" ");
 			UrlValidator validator = new UrlValidator();
@@ -40,6 +41,10 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 				}
 			}
 		}
+	}
+
+	private boolean isNotInChannel(MessageChannel channel, String channelName) {
+		return channelName.equals(channel.getName());
 	}
 
 	private boolean hasRole(Member member, String roleName) {
