@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.handler;
+package ch.kschmidster.kschmidsterbot.discord.handlers;
 
 import java.util.Collection;
 
@@ -12,15 +12,20 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.managers.GuildController;
 
 public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEvent> {
 	private final static Log LOG = LogFactory.getLog(NewGuildMemberJoinHandler.class);
 
+	public NewGuildMemberJoinHandler() {
+		super(GuildMemberJoinEvent.class);
+	}
+
 	@Override
-	public void register(Collection<IHandler> handles) {
-		LOG.info("Register NewGuildMemberHandler");
+	public void register(Collection<IHandler<? extends Event>> handles) {
+		LOG.info("Register " + getClass().getSimpleName());
 		handles.add(this);
 	}
 

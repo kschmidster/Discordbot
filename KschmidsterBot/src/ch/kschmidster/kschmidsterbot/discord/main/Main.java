@@ -3,9 +3,10 @@ package ch.kschmidster.kschmidsterbot.discord.main;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ch.kschmidster.kschmidsterbot.discord.handler.LinkPostedHandler;
-import ch.kschmidster.kschmidsterbot.discord.handler.NewGuildMemberJoinHandler;
-import ch.kschmidster.kschmidsterbot.discord.handler.ShutdownHandler;
+import ch.kschmidster.kschmidsterbot.discord.core.commands.ShutdownCommand;
+import ch.kschmidster.kschmidsterbot.discord.core.commands.WerIstBodoCommand;
+import ch.kschmidster.kschmidsterbot.discord.handlers.LinkPostedHandler;
+import ch.kschmidster.kschmidsterbot.discord.handlers.NewGuildMemberJoinHandler;
 import ch.kschmidster.kschmidsterbot.discord.listeners.MyListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -59,14 +60,20 @@ public class Main {
 		LOG.info("Add Listener");
 		MyListenerAdapter myListenerAdapter = new MyListenerAdapter();
 		jda.addEventListener(myListenerAdapter);
-		addHandles(myListenerAdapter);
+		registerHandles(myListenerAdapter);
+		registerCommands(myListenerAdapter);
 	}
 
-	private static void addHandles(MyListenerAdapter myListenerAdapter) {
+	private static void registerHandles(MyListenerAdapter myListenerAdapter) {
 		LOG.info("Register all handles");
 		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler());
 		myListenerAdapter.registerHandle(new LinkPostedHandler());
-		myListenerAdapter.registerHandle(new ShutdownHandler());
+	}
+
+	private static void registerCommands(MyListenerAdapter myListenerAdapter) {
+		LOG.info("Register all commands");
+		myListenerAdapter.registerHandle(new ShutdownCommand());
+		myListenerAdapter.registerHandle(new WerIstBodoCommand());
 	}
 
 }

@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.handler;
+package ch.kschmidster.kschmidsterbot.discord.handlers;
 
 import java.util.Collection;
 
@@ -13,14 +13,19 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
+import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	private final static Log LOG = LogFactory.getLog(LinkPostedHandler.class);
 
+	public LinkPostedHandler() {
+		super(MessageReceivedEvent.class);
+	}
+
 	@Override
-	public void register(Collection<IHandler> handles) {
-		LOG.info("Register LinkPostedHandler");
+	public void register(Collection<IHandler<? extends Event>> handles) {
+		LOG.info("Register " + getClass().getSimpleName());
 		handles.add(this);
 	}
 
@@ -44,7 +49,7 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	}
 
 	private boolean isNotInChannel(MessageChannel channel, String channelName) {
-		return channelName.equals(channel.getName());
+		return !channelName.equals(channel.getName());
 	}
 
 	private boolean hasRole(Member member, String roleName) {

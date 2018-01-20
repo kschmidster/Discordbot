@@ -10,9 +10,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
-import ch.kschmidster.kschmidsterbot.discord.handler.LinkPostedHandler;
-import ch.kschmidster.kschmidsterbot.discord.handler.NewGuildMemberJoinHandler;
-import ch.kschmidster.kschmidsterbot.discord.handler.ShutdownHandler;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -26,9 +23,9 @@ public final class MyListenerAdapter extends ListenerAdapter {
 	private static final String DONE_INVOKING_HANDLERS = "Done invoking the handlers";
 	private static final String INVOKING_HANDLERS = "Invoking the handlers ...";
 
-	private Collection<IHandler> handles = new ArrayList<>();
+	private Collection<IHandler<? extends Event>> handles = new ArrayList<>();
 
-	public void registerHandle(IHandler handle) {
+	public void registerHandle(IHandler<? extends Event> handle) {
 		handle.register(handles);
 	}
 
@@ -37,7 +34,7 @@ public final class MyListenerAdapter extends ListenerAdapter {
 		LOG.debug(String.format(RECEIVED_EVENT, "MessageReceivedEvent"));
 		if (notNull(event.getGuild(), event.getChannel())) {
 			LOG.debug(INVOKING_HANDLERS);
-			getHandlers(event, LinkPostedHandler.class)//
+			getHandlers(MessageReceivedEvent.class)//
 					.forEach(h -> h.handleEvent(event));
 			LOG.debug(DONE_INVOKING_HANDLERS);
 		}
@@ -47,7 +44,7 @@ public final class MyListenerAdapter extends ListenerAdapter {
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
 		LOG.debug(String.format(RECEIVED_EVENT, "PrivateMessageReceivedEvent"));
 		LOG.debug(INVOKING_HANDLERS);
-		getHandlers(event, ShutdownHandler.class)//
+		getHandlers(PrivateMessageReceivedEvent.class)//
 				.forEach(h -> h.handleEvent(event));
 		LOG.debug(DONE_INVOKING_HANDLERS);
 	}
@@ -57,7 +54,7 @@ public final class MyListenerAdapter extends ListenerAdapter {
 		LOG.debug(String.format(RECEIVED_EVENT, "GuildMemberJoinEvent"));
 		if (notNull(event.getGuild(), event.getMember())) {
 			LOG.debug(INVOKING_HANDLERS);
-			getHandlers(event, NewGuildMemberJoinHandler.class)//
+			getHandlers(GuildMemberJoinEvent.class)//
 					.forEach(h -> h.handleEvent(event));
 			LOG.debug(DONE_INVOKING_HANDLERS);
 		}
@@ -70,10 +67,10 @@ public final class MyListenerAdapter extends ListenerAdapter {
 				.isEmpty();
 	}
 
-	private <T extends IHandler> Stream<T> getHandlers(Event event, Class<T> clazz) {
+	private <T extends Event> Stream<IHandler<T>> getHandlers(Class<T> clazz) {
 		return handles.stream()//
-				.filter(clazz::isInstance)//
-				.map(clazz::cast);
+				.filter(h -> clazz.equals(h.getGenericType()))//
+				.map(IHandler.class::cast);
 	}
 
 }

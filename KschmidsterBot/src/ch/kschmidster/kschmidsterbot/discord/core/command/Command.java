@@ -19,6 +19,7 @@ public enum Command {
 	public boolean isCommand(String commandName) {
 		LOG.debug("Checking if " + name + " is same as " + commandName);
 		if (commandName != null && commandName.startsWith(PREFIX)) {
+			LOG.info("Is command " + commandName);
 			return commandName.substring(1, commandName.length()).equals(name);
 		}
 		return false;
