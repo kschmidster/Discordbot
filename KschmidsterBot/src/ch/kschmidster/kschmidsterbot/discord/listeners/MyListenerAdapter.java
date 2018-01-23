@@ -14,6 +14,7 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public final class MyListenerAdapter extends ListenerAdapter {
@@ -58,6 +59,20 @@ public final class MyListenerAdapter extends ListenerAdapter {
 					.forEach(h -> h.handleEvent(event));
 			LOG.debug(DONE_INVOKING_HANDLERS);
 		}
+	}
+
+	@Override
+	public void onUserGameUpdate(UserGameUpdateEvent event) {
+		LOG.debug(String.format(RECEIVED_EVENT, "UserGameUpdateEvent"));
+		LOG.debug(INVOKING_HANDLERS);
+		if (notNull(event)) {
+			getHandlers(UserGameUpdateEvent.class)//
+					.forEach(h -> h.handleEvent(event));
+		} else {
+			// FIXME strange but I got some NPEs eventually
+			LOG.warn("User game update event is null!");
+		}
+		LOG.debug(DONE_INVOKING_HANDLERS);
 	}
 
 	private boolean notNull(Object... objects) {

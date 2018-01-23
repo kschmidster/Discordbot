@@ -40,6 +40,7 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 			UrlValidator validator = new UrlValidator();
 			for (String s : content) {
 				if (validator.isValid(s)) {
+					// TODO message link to root
 					LOG.info("Link posted from a Unicorn detected!!! Member: " + event.getMember().getEffectiveName()
 							+ " link: " + s);
 					deleteMessage(event, s);

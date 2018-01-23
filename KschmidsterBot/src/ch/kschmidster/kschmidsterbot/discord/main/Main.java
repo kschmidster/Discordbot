@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import ch.kschmidster.kschmidsterbot.discord.core.commands.ShutdownCommand;
 import ch.kschmidster.kschmidsterbot.discord.core.commands.WerIstBodoCommand;
 import ch.kschmidster.kschmidsterbot.discord.handlers.LinkPostedHandler;
+import ch.kschmidster.kschmidsterbot.discord.handlers.DiscordOwnerIsStreamingHandler;
 import ch.kschmidster.kschmidsterbot.discord.handlers.NewGuildMemberJoinHandler;
 import ch.kschmidster.kschmidsterbot.discord.listeners.MyListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
@@ -20,6 +21,7 @@ public class Main {
 
 	public static final String TEXT_CHANNEL_UNICORN_TREFF = "unicorn-treff";
 	public static final String TEXT_CHANNEL_ZEIT_FUER_CLIPS = "zeitfuerclips";
+	public static final String TEXT_ANKUENDIGUNGEN = "ankuendigungen";
 	public static final String ROLE_UNICORN = "Unicorn";
 	public static final String GUILD_SPACE_UNICORN = "Space Unicorns";
 
@@ -68,6 +70,7 @@ public class Main {
 		LOG.info("Register all handles");
 		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler());
 		myListenerAdapter.registerHandle(new LinkPostedHandler());
+		myListenerAdapter.registerHandle(new DiscordOwnerIsStreamingHandler());
 	}
 
 	private static void registerCommands(MyListenerAdapter myListenerAdapter) {

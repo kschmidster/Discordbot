@@ -42,13 +42,6 @@ public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEv
 				.queue();
 	}
 
-	private TextChannel getTextChannel(Collection<TextChannel> textChannels, String channelName) {
-		return textChannels.stream()//
-				.filter(tc -> tc.getName().equals(channelName))//
-				.findFirst()//
-				.get();
-	}
-
 	private Role getUnicornRole(Collection<Role> roles, String roleName) {
 		return roles.stream()//
 				.filter(r -> r.getName().equals(roleName))//
