@@ -65,12 +65,9 @@ public final class MyListenerAdapter extends ListenerAdapter {
 	public void onUserGameUpdate(UserGameUpdateEvent event) {
 		LOG.debug(String.format(RECEIVED_EVENT, "UserGameUpdateEvent"));
 		LOG.debug(INVOKING_HANDLERS);
-		if (notNull(event)) {
+		if (notNull(event.getCurrentGame())) {
 			getHandlers(UserGameUpdateEvent.class)//
 					.forEach(h -> h.handleEvent(event));
-		} else {
-			// FIXME strange but I got some NPEs eventually
-			LOG.warn("User game update event is null!");
 		}
 		LOG.debug(DONE_INVOKING_HANDLERS);
 	}

@@ -31,7 +31,6 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 	public void handleEvent(UserGameUpdateEvent event) {
 		LOG.debug("Handle game update");
 		Game currentGame = event.getCurrentGame();
-
 		if (GameType.STREAMING.equals(currentGame.getType())//
 				&& isDiscordOwner(event)) {
 			LOG.info("Discord owner is streaming");
