@@ -2,6 +2,8 @@ package ch.kschmidster.kschmidsterbot.discord.core.handler;
 
 import java.util.Collection;
 
+import org.apache.commons.configuration2.event.ConfigurationEvent;
+
 import net.dv8tion.jda.core.events.Event;
 
 public interface IHandler<E extends Event> {
@@ -11,5 +13,7 @@ public interface IHandler<E extends Event> {
 	Class<E> getGenericType();
 
 	void handleEvent(E event);
+
+	void updateConfigs(ConfigurationEvent configEvent);
 
 }

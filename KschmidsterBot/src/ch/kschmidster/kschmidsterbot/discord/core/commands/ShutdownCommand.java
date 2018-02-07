@@ -2,6 +2,8 @@ package ch.kschmidster.kschmidsterbot.discord.core.commands;
 
 import java.util.Collection;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.event.ConfigurationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -16,11 +18,11 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent> {
 	private static final Log LOG = LogFactory.getLog(ShutdownCommand.class);
 
-	public ShutdownCommand() {
-		super(PrivateMessageReceivedEvent.class);
-	}
+	private static final String PASSWORD = "password";
 
-	private static final String PROPERTY_PASSWORD = "password";
+	public ShutdownCommand(Configuration configuration) {
+		super(PrivateMessageReceivedEvent.class, configuration);
+	}
 
 	@Override
 	public void register(Collection<IHandler<? extends Event>> handles) {
@@ -52,7 +54,13 @@ public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent
 
 	private boolean passIsCorrect(String password) {
 		LOG.debug("Checking if the password is correct");
-		return password.equals(System.getProperty(PROPERTY_PASSWORD));
+		return password.equals(getConfiguration().getString(PASSWORD));
+	}
+
+	@Override
+	public void updateConfigs(ConfigurationEvent configEvent) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

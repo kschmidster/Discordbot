@@ -2,6 +2,8 @@ package ch.kschmidster.kschmidsterbot.discord.handlers;
 
 import java.util.Collection;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.event.ConfigurationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,8 +21,8 @@ import net.dv8tion.jda.core.managers.GuildController;
 public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEvent> {
 	private final static Log LOG = LogFactory.getLog(NewGuildMemberJoinHandler.class);
 
-	public NewGuildMemberJoinHandler() {
-		super(GuildMemberJoinEvent.class);
+	public NewGuildMemberJoinHandler(Configuration configuration) {
+		super(GuildMemberJoinEvent.class, configuration);
 	}
 
 	@Override
@@ -47,6 +49,12 @@ public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEv
 				.filter(r -> r.getName().equals(roleName))//
 				.findFirst()//
 				.get();
+	}
+
+	@Override
+	public void updateConfigs(ConfigurationEvent configEvent) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

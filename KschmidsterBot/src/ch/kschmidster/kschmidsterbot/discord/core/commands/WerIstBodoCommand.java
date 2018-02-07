@@ -3,6 +3,8 @@ package ch.kschmidster.kschmidsterbot.discord.core.commands;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.event.ConfigurationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,8 +19,8 @@ public class WerIstBodoCommand extends AbstractCommand<MessageReceivedEvent> {
 	private final static String REGEX = "b+o+d+o+";
 	private final static Pattern PATTERN = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
 
-	public WerIstBodoCommand() {
-		super(MessageReceivedEvent.class);
+	public WerIstBodoCommand(Configuration configuration) {
+		super(MessageReceivedEvent.class, configuration);
 	}
 
 	@Override
@@ -36,6 +38,12 @@ public class WerIstBodoCommand extends AbstractCommand<MessageReceivedEvent> {
 			// TODO use a variety of responses
 			event.getChannel().sendMessage("WER IST BODOO?!?!?!").queue();
 		}
+	}
+
+	@Override
+	public void updateConfigs(ConfigurationEvent configEvent) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

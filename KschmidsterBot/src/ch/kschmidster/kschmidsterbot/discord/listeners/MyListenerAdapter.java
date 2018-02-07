@@ -6,6 +6,10 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.builder.ReloadingFileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.event.ConfigurationEvent;
+import org.apache.commons.configuration2.event.EventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,7 +21,7 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public final class MyListenerAdapter extends ListenerAdapter {
+public final class MyListenerAdapter extends ListenerAdapter implements EventListener<ConfigurationEvent> {
 	private final static Log LOG = LogFactory.getLog(MyListenerAdapter.class);
 
 	private static final String RECEIVED_EVENT = "Received event %s";
@@ -28,6 +32,11 @@ public final class MyListenerAdapter extends ListenerAdapter {
 
 	public void registerHandle(IHandler<? extends Event> handle) {
 		handle.register(handles);
+	}
+
+	public void registerTo(ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> builder) {
+		// TODO also for ConfigurationEvent.ADD_PROPERTY
+		builder.addEventListener(ConfigurationEvent.SET_PROPERTY, this);
 	}
 
 	@Override
@@ -83,6 +92,11 @@ public final class MyListenerAdapter extends ListenerAdapter {
 		return handles.stream()//
 				.filter(h -> clazz.equals(h.getGenericType()))//
 				.map(IHandler.class::cast);
+	}
+
+	@Override
+	public void onEvent(ConfigurationEvent event) {
+		handles.forEach(h -> h.updateConfigs(event));
 	}
 
 }

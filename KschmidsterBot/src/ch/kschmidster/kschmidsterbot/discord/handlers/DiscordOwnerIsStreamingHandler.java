@@ -2,6 +2,8 @@ package ch.kschmidster.kschmidsterbot.discord.handlers;
 
 import java.util.Collection;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.event.ConfigurationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,8 +19,8 @@ import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
 public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpdateEvent> {
 	private final static Log LOG = LogFactory.getLog(DiscordOwnerIsStreamingHandler.class);
 
-	public DiscordOwnerIsStreamingHandler() {
-		super(UserGameUpdateEvent.class);
+	public DiscordOwnerIsStreamingHandler(Configuration configuration) {
+		super(UserGameUpdateEvent.class, configuration);
 	}
 
 	@Override
@@ -44,8 +46,14 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 
 	private boolean isDiscordOwner(UserGameUpdateEvent event) {
 		LOG.debug("Check if user: " + event.getMember().getEffectiveName() + " is discord owner");
-		return System.getProperty("discordOwner")//
+		return getConfiguration().getString("discordOwner")//
 				.equals(event.getMember().getEffectiveName());
+	}
+
+	@Override
+	public void updateConfigs(ConfigurationEvent configEvent) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
