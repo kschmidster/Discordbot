@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import ch.kschmidster.kschmidsterbot.discord.core.handler.AbstractHandler;
 import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
-import ch.kschmidster.kschmidsterbot.discord.main.Main;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
@@ -20,6 +19,10 @@ import net.dv8tion.jda.core.managers.GuildController;
 
 public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEvent> {
 	private final static Log LOG = LogFactory.getLog(NewGuildMemberJoinHandler.class);
+
+	private final static String PREFIX_CONFIG = "newguildmemberjoin.";
+	private final static String INITIAL_ROLE = PREFIX_CONFIG + "initialrole";
+	private final static String CHANNEL = PREFIX_CONFIG + "channel";
 
 	public NewGuildMemberJoinHandler(Configuration configuration) {
 		super(GuildMemberJoinEvent.class, configuration);
@@ -35,13 +38,13 @@ public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEv
 	public void handleEvent(GuildMemberJoinEvent event) {
 		LOG.info("Handle new member join");
 		Guild guild = event.getGuild();
-		TextChannel channel = getTextChannel(guild.getTextChannels(), Main.TEXT_CHANNEL_UNICORN_TREFF);
+		TextChannel channel = getTextChannel(guild.getTextChannels(), getConfigString(CHANNEL));
 		Member member = event.getMember();
 		LOG.info("Welcome new member: " + member.getEffectiveName());
 		channel.sendMessage("A new unicorn is born!! Hello " + member.getAsMention()).queue();
 		LOG.info("Add unicorn role to user");
-		new GuildController(guild).modifyMemberRoles(member, getUnicornRole(guild.getRoles(), Main.ROLE_UNICORN))
-				.queue();
+		new GuildController(guild)
+				.modifyMemberRoles(member, getUnicornRole(guild.getRoles(), getConfigString(INITIAL_ROLE))).queue();
 	}
 
 	private Role getUnicornRole(Collection<Role> roles, String roleName) {

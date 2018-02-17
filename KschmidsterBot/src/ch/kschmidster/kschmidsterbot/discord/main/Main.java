@@ -24,20 +24,11 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 
 public class Main {
-	private static final String CONFIG_PROPERTIES = "config.properties";
-
 	private static final Log LOG = LogFactory.getLog(Main.class);
 
-	// TODO maybe better handling of those consts
-	public static final String ROOT = "kschmidster";
-
-	public static final String TEXT_CHANNEL_UNICORN_TREFF = "unicorn-treff";
-	public static final String TEXT_CHANNEL_ZEIT_FUER_CLIPS = "zeitfuerclips";
-	public static final String TEXT_ANKUENDIGUNGEN = "ankuendigungen";
-	public static final String ROLE_UNICORN = "Unicorn";
-	public static final String GUILD_SPACE_UNICORN = "Space Unicorns";
-
-	public static final int LAST_MESSAGES = 10;
+	private static final String CONFIG_PROPERTIES = "config.properties";
+	private static final String PREFIX_CONFIG = "bot.";
+	private static final String TOKEN = PREFIX_CONFIG + "token";
 
 	public static void main(String[] args) {
 		LOG.info("Initializing automatic config file reloader...");
@@ -87,7 +78,7 @@ public class Main {
 
 	private static String getToken(Configuration configuration) {
 		LOG.debug("Retrieving discord token ...");
-		String token = configuration.getString("token");
+		String token = configuration.getString(TOKEN);
 		if (token == null) {
 			IllegalArgumentException exception = new IllegalArgumentException("Discord token as configuration needed!");
 			LOG.fatal("Token not found!", exception);

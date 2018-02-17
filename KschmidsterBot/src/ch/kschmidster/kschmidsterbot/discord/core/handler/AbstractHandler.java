@@ -32,7 +32,15 @@ public abstract class AbstractHandler<E extends Event> implements IHandler<E> {
 				.get();
 	}
 
-	public Configuration getConfiguration() {
+	protected String getConfigString(String configuration) {
+		return getConfiguration().getString(configuration);
+	}
+
+	protected int getConfigInt(String configuration) {
+		return getConfiguration().getInt(configuration);
+	}
+
+	private Configuration getConfiguration() {
 		if (configuration == null) {
 			RuntimeException noConfigException = new IllegalStateException("The configuration is not yet set");
 			LOG.error("Tried to access the configuration, but was not set yet", noConfigException);

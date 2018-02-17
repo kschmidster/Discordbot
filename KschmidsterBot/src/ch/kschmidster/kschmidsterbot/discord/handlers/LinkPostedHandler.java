@@ -10,7 +10,6 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 import ch.kschmidster.kschmidsterbot.discord.core.handler.AbstractHandler;
 import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
-import ch.kschmidster.kschmidsterbot.discord.main.Main;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -21,6 +20,12 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	private final static Log LOG = LogFactory.getLog(LinkPostedHandler.class);
+
+	private final static String PREFIX_CONFIG = "linkposted.";
+	private static final String NOT_ALLOWED_ROLE = PREFIX_CONFIG + "notallowedrole";
+	private static final String LAST_MESSAGES = PREFIX_CONFIG + "lastmessagestocheck";
+	private final static String REPORT_CHANNEL = PREFIX_CONFIG + "reportchannel";
+	private final static String ACCEPTED_CHANNEL = PREFIX_CONFIG + "acceptedchannel";
 
 	public LinkPostedHandler(Configuration configuration) {
 		super(MessageReceivedEvent.class, configuration);
@@ -36,8 +41,8 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	public void handleEvent(MessageReceivedEvent event) {
 		String message = event.getMessage().getContentDisplay();
 		LOG.info("Handle Message from " + event.getAuthor().getName() + ": " + message);
-		if (isNotInChannel(event.getChannel(), Main.TEXT_CHANNEL_ZEIT_FUER_CLIPS)
-				&& (hasRole(event.getMember(), Main.ROLE_UNICORN) || hasNoRole(event.getMember()))) {
+		if (isNotInChannel(event.getChannel(), getConfigString(ACCEPTED_CHANNEL))
+				&& (hasRole(event.getMember(), getConfigString(NOT_ALLOWED_ROLE)) || hasNoRole(event.getMember()))) {
 			LOG.info("Handle message");
 			String content[] = message.split(" ");
 			UrlValidator validator = new UrlValidator();
@@ -80,7 +85,7 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 		LOG.info("Deleting message containing link");
 		MessageChannel channel = event.getChannel();
 		MessageHistory history = new MessageHistory(channel);
-		Message message = getToDeleteMessage(history.retrievePast(Main.LAST_MESSAGES).complete(), link);
+		Message message = getToDeleteMessage(history.retrievePast(getConfigInt(LAST_MESSAGES)).complete(), link);
 		if (message != null) {
 			LOG.info("Inform user that he is not allowed to post links");
 			channel.sendMessage(event.getMember().getAsMention()
@@ -90,16 +95,17 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 		}
 	}
 
+	// FIXME supposed to be a channel
 	private User getRootUser(Collection<User> users) {
 		return users.stream()//
-				.filter(u -> u.getName().equals(Main.ROOT))//
+				.filter(u -> u.getName().equals(getConfigString(REPORT_CHANNEL)))//
 				.findFirst()//
 				.get();
 	}
 
 	private void sendLinkToRoot(MessageReceivedEvent event, User root, String link) {
 		root.openPrivateChannel()
-		.queue(c -> c.sendMessage(event.getAuthor() + " just posted this link: " + link).queue());
+				.queue(c -> c.sendMessage(event.getAuthor() + " just posted this link: " + link).queue());
 	}
 
 	@Override

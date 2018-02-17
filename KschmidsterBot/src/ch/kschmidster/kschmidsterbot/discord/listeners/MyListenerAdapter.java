@@ -28,7 +28,7 @@ public final class MyListenerAdapter extends ListenerAdapter implements EventLis
 	private static final String DONE_INVOKING_HANDLERS = "Done invoking the handlers";
 	private static final String INVOKING_HANDLERS = "Invoking the handlers ...";
 
-	private Collection<IHandler<? extends Event>> handles = new ArrayList<>();
+	private final Collection<IHandler<? extends Event>> handles = new ArrayList<>();
 
 	public void registerHandle(IHandler<? extends Event> handle) {
 		handle.register(handles);

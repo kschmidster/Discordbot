@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import ch.kschmidster.kschmidsterbot.discord.core.command.AbstractCommand;
 import ch.kschmidster.kschmidsterbot.discord.core.command.Command;
 import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
-import ch.kschmidster.kschmidsterbot.discord.main.Main;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -18,7 +17,9 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent> {
 	private static final Log LOG = LogFactory.getLog(ShutdownCommand.class);
 
-	private static final String PASSWORD = "password";
+	private static final String PREFIX_CONFIG = "bot.";
+	private static final String ROOT = PREFIX_CONFIG + "root";
+	private static final String PASSWORD = PREFIX_CONFIG + "password";
 
 	public ShutdownCommand(Configuration configuration) {
 		super(PrivateMessageReceivedEvent.class, configuration);
@@ -49,12 +50,12 @@ public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent
 
 	private boolean userIsPermitted(User user) {
 		LOG.debug("Checking if user: " + user.getName() + " is permitted to shut me down");
-		return user.getName().equals(Main.ROOT);
+		return user.getName().equals(getConfigString(ROOT));
 	}
 
 	private boolean passIsCorrect(String password) {
 		LOG.debug("Checking if the password is correct");
-		return password.equals(getConfiguration().getString(PASSWORD));
+		return password.equals(getConfigString(PASSWORD));
 	}
 
 	@Override
