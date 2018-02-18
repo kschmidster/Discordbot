@@ -14,12 +14,15 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	private final static Log log = LogFactory.getLog(LinkPostedHandler.class);
+
+	private static final String SPACE_MOD = "Space Mod";
 
 	private final static String PREFIX_CONFIG = "linkposted.";
 	private static final String NOT_ALLOWED_ROLE = PREFIX_CONFIG + "notallowedrole";
@@ -69,10 +72,18 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 		return member.getRoles().isEmpty();
 	}
 
-	private void sendLinkToViolationChannel(MessageReceivedEvent event, String s) {
+	private void sendLinkToViolationChannel(MessageReceivedEvent event, String link) {
 		TextChannel channel = getTextChannel(event.getGuild(), getConfigString(REPORT_CHANNEL));
-		// TODO find @here mention
-		channel.sendMessage(channel.getAsMention() + " " + event.getAuthor() + " just posted this link: " + s).queue();
+		channel.sendMessage(
+				getRole(event, SPACE_MOD).getAsMention() + " " + event.getAuthor() + " just posted this link: " + link)
+				.queue();
+	}
+
+	private Role getRole(MessageReceivedEvent event, String role) {
+		return event.getGuild().getRoles().stream()//
+				.filter(r -> r.getName().equals(role))//
+				.findFirst()//
+				.get();
 	}
 
 	private Message getToDeleteMessage(Collection<Message> messages, String link) {
