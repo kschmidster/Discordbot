@@ -5,7 +5,9 @@ import org.apache.commons.logging.LogFactory;
 
 public enum Command {
 
-	SHUTDOWN("shutdown");
+	SHUTDOWN("shutdown"), //
+	PERMIT("permit"), //
+	SOURCE("source");
 
 	private final static Log LOG = LogFactory.getLog(Command.class);
 

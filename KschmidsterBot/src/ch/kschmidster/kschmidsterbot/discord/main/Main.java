@@ -13,8 +13,11 @@ import org.apache.commons.configuration2.reloading.PeriodicReloadingTrigger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ch.kschmidster.kschmidsterbot.discord.core.commands.PermitUserCommand;
 import ch.kschmidster.kschmidsterbot.discord.core.commands.ShutdownCommand;
+import ch.kschmidster.kschmidsterbot.discord.core.commands.SourceCommand;
 import ch.kschmidster.kschmidsterbot.discord.core.commands.WerIstBodoCommand;
+import ch.kschmidster.kschmidsterbot.discord.handlers.BotGotMentionedHandler;
 import ch.kschmidster.kschmidsterbot.discord.handlers.DiscordOwnerIsStreamingHandler;
 import ch.kschmidster.kschmidsterbot.discord.handlers.LinkPostedHandler;
 import ch.kschmidster.kschmidsterbot.discord.handlers.NewGuildMemberJoinHandler;
@@ -24,21 +27,21 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 
 public class Main {
-	private static final Log LOG = LogFactory.getLog(Main.class);
+	private static final Log log = LogFactory.getLog(Main.class);
 
 	private static final String CONFIG_PROPERTIES = "config.properties";
 	private static final String PREFIX_CONFIG = "bot.";
 	private static final String TOKEN = PREFIX_CONFIG + "token";
 
 	public static void main(String[] args) {
-		LOG.info("Initializing automatic config file reloader...");
+		log.info("Initializing automatic config file reloader...");
 		ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> builder = initializeConfigurationLoader();
 		Configuration configuration = getConfiguration(builder);
-		LOG.info("Done!");
+		log.info("Done!");
 
-		LOG.info("Starting up kschmidsterbot for discord ...");
+		log.info("Starting up kschmidsterbot for discord ...");
 		initializeDiscordBot(setUpJda(AccountType.BOT, getToken(configuration)), builder, configuration);
-		LOG.info("Kschmidsterbot for discord is up and running :D");
+		log.info("Kschmidsterbot for discord is up and running :D");
 	}
 
 	private static ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> initializeConfigurationLoader() {
@@ -49,19 +52,19 @@ public class Main {
 								.fileBased()//
 								.setFile(propertiesFile));
 		new PeriodicReloadingTrigger(builder.getReloadingController(), null, 1, TimeUnit.MINUTES).start();
-		LOG.debug("Reloader is set");
+		log.debug("Reloader is set");
 		return builder;
 	}
 
 	private static File getPropertiesFile() {
-		LOG.debug("Checking if config.properties file exists");
+		log.debug("Checking if config.properties file exists");
 		File propertiesFile = new File(CONFIG_PROPERTIES);
 		if (!propertiesFile.exists()) {
 			RuntimeException noConfigFileException = new IllegalStateException("Discord bot needs a config file!");
-			LOG.fatal("There is no config file!", noConfigFileException);
+			log.fatal("There is no config file!", noConfigFileException);
 			throw noConfigFileException;
 		}
-		LOG.debug("Found config.properties file!");
+		log.debug("Found config.properties file!");
 		return propertiesFile;
 	}
 
@@ -71,40 +74,40 @@ public class Main {
 			return builder.getConfiguration();
 		} catch (ConfigurationException e) {
 			RuntimeException noConfigException = new IllegalStateException("Failed to load the configuration");
-			LOG.fatal("Could not load the configuration", noConfigException);
+			log.fatal("Could not load the configuration", noConfigException);
 			throw noConfigException;
 		}
 	}
 
 	private static String getToken(Configuration configuration) {
-		LOG.debug("Retrieving discord token ...");
+		log.debug("Retrieving discord token ...");
 		String token = configuration.getString(TOKEN);
 		if (token == null) {
 			IllegalArgumentException exception = new IllegalArgumentException("Discord token as configuration needed!");
-			LOG.fatal("Token not found!", exception);
+			log.fatal("Token not found!", exception);
 			throw exception;
 		}
-		LOG.debug("Retrieved discord token");
+		log.debug("Retrieved discord token");
 		return token;
 	}
 
 	private static JDA setUpJda(AccountType accountType, String token) {
-		LOG.info("Setting up the JDA ...");
+		log.info("Setting up the JDA ...");
 		try {
 			JDA jda = new JDABuilder(accountType).setToken(token).buildBlocking();
-			LOG.info("Done setting up JDA");
+			log.info("Done setting up JDA");
 			return jda;
 		} catch (Throwable t) {
 			String message = "Could not initialize JDA";
 			IllegalStateException exception = new IllegalStateException(message);
-			LOG.fatal(message, exception);
+			log.fatal(message, exception);
 			throw exception;
 		}
 	}
 
 	private static void initializeDiscordBot(JDA jda,
 			ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> builder, Configuration configuration) {
-		LOG.info("Add Listener");
+		log.info("Add Listener");
 		MyListenerAdapter myListenerAdapter = new MyListenerAdapter();
 		myListenerAdapter.registerTo(builder);
 		jda.addEventListener(myListenerAdapter);
@@ -113,16 +116,19 @@ public class Main {
 	}
 
 	private static void registerHandles(MyListenerAdapter myListenerAdapter, Configuration configuration) {
-		LOG.info("Register all handles");
+		log.info("Register all handles");
 		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler(configuration));
 		myListenerAdapter.registerHandle(new LinkPostedHandler(configuration));
 		myListenerAdapter.registerHandle(new DiscordOwnerIsStreamingHandler(configuration));
+		myListenerAdapter.registerHandle(new BotGotMentionedHandler(configuration));
 	}
 
 	private static void registerCommands(MyListenerAdapter myListenerAdapter, Configuration configuration) {
-		LOG.info("Register all commands");
+		log.info("Register all commands");
 		myListenerAdapter.registerHandle(new ShutdownCommand(configuration));
 		myListenerAdapter.registerHandle(new WerIstBodoCommand(configuration));
+		myListenerAdapter.registerHandle(new PermitUserCommand(configuration));
+		myListenerAdapter.registerHandle(new SourceCommand(configuration));
 	}
 
 }

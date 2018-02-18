@@ -16,7 +16,7 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
 
 public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpdateEvent> {
-	private final static Log LOG = LogFactory.getLog(DiscordOwnerIsStreamingHandler.class);
+	private final static Log log = LogFactory.getLog(DiscordOwnerIsStreamingHandler.class);
 
 	private final static String PREFIX_CONFIG = "discordownerisstreaming.";
 	private static final String DISCORD_OWNER = PREFIX_CONFIG + "discordOwner";
@@ -28,28 +28,27 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 
 	@Override
 	public void register(Collection<IHandler<? extends Event>> handles) {
-		LOG.info("Register " + getClass().getSimpleName());
+		log.info("Register " + getClass().getSimpleName());
 		handles.add(this);
 	}
 
 	@Override
 	public void handleEvent(UserGameUpdateEvent event) {
-		LOG.debug("Handle game update");
+		log.debug("Handle game update");
 		Game currentGame = event.getCurrentGame();
-		// FIXME this is the title of the stream not the game
 		if (GameType.STREAMING.equals(currentGame.getType())//
 				&& isDiscordOwner(event)) {
-			LOG.info("Discord owner is streaming");
-			TextChannel channel = getTextChannel(event.getGuild().getTextChannels(), getConfigString(CHANNEL));
+			log.info("Discord owner is streaming");
+			TextChannel channel = getTextChannel(event.getGuild(), getConfigString(CHANNEL));
 
 			channel.sendMessage("OMG!!!").queue();
-			channel.sendMessage(event.getMember().getEffectiveName() + " hat gerade ihren Stream gestartet!!!").queue();
-			channel.sendMessage("Sie spielt " + event.getCurrentGame().getName()).queue();
+			channel.sendMessage(event.getGuild().getPublicRole().getAsMention() + " "
+					+ event.getMember().getEffectiveName() + " hat gerade ihren Stream gestartet!!!").queue();
 		}
 	}
 
 	private boolean isDiscordOwner(UserGameUpdateEvent event) {
-		LOG.debug("Check if user: " + event.getMember().getEffectiveName() + " is discord owner");
+		log.debug("Check if user: " + event.getMember().getEffectiveName() + " is discord owner");
 		return getConfigString(DISCORD_OWNER)//
 				.equals(event.getMember().getEffectiveName());
 	}

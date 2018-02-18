@@ -22,7 +22,7 @@ import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public final class MyListenerAdapter extends ListenerAdapter implements EventListener<ConfigurationEvent> {
-	private final static Log LOG = LogFactory.getLog(MyListenerAdapter.class);
+	private final static Log log = LogFactory.getLog(MyListenerAdapter.class);
 
 	private static final String RECEIVED_EVENT = "Received event %s";
 	private static final String DONE_INVOKING_HANDLERS = "Done invoking the handlers";
@@ -41,44 +41,44 @@ public final class MyListenerAdapter extends ListenerAdapter implements EventLis
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
-		LOG.debug(String.format(RECEIVED_EVENT, "MessageReceivedEvent"));
+		log.debug(String.format(RECEIVED_EVENT, "MessageReceivedEvent"));
 		if (notNull(event.getGuild(), event.getChannel())) {
-			LOG.debug(INVOKING_HANDLERS);
+			log.debug(INVOKING_HANDLERS);
 			getHandlers(MessageReceivedEvent.class)//
 					.forEach(h -> h.handleEvent(event));
-			LOG.debug(DONE_INVOKING_HANDLERS);
+			log.debug(DONE_INVOKING_HANDLERS);
 		}
 	}
 
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-		LOG.debug(String.format(RECEIVED_EVENT, "PrivateMessageReceivedEvent"));
-		LOG.debug(INVOKING_HANDLERS);
+		log.debug(String.format(RECEIVED_EVENT, "PrivateMessageReceivedEvent"));
+		log.debug(INVOKING_HANDLERS);
 		getHandlers(PrivateMessageReceivedEvent.class)//
 				.forEach(h -> h.handleEvent(event));
-		LOG.debug(DONE_INVOKING_HANDLERS);
+		log.debug(DONE_INVOKING_HANDLERS);
 	}
 
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		LOG.debug(String.format(RECEIVED_EVENT, "GuildMemberJoinEvent"));
+		log.debug(String.format(RECEIVED_EVENT, "GuildMemberJoinEvent"));
 		if (notNull(event.getGuild(), event.getMember())) {
-			LOG.debug(INVOKING_HANDLERS);
+			log.debug(INVOKING_HANDLERS);
 			getHandlers(GuildMemberJoinEvent.class)//
 					.forEach(h -> h.handleEvent(event));
-			LOG.debug(DONE_INVOKING_HANDLERS);
+			log.debug(DONE_INVOKING_HANDLERS);
 		}
 	}
 
 	@Override
 	public void onUserGameUpdate(UserGameUpdateEvent event) {
-		LOG.debug(String.format(RECEIVED_EVENT, "UserGameUpdateEvent"));
-		LOG.debug(INVOKING_HANDLERS);
+		log.debug(String.format(RECEIVED_EVENT, "UserGameUpdateEvent"));
+		log.debug(INVOKING_HANDLERS);
 		if (notNull(event.getCurrentGame())) {
 			getHandlers(UserGameUpdateEvent.class)//
 					.forEach(h -> h.handleEvent(event));
 		}
-		LOG.debug(DONE_INVOKING_HANDLERS);
+		log.debug(DONE_INVOKING_HANDLERS);
 	}
 
 	private boolean notNull(Object... objects) {

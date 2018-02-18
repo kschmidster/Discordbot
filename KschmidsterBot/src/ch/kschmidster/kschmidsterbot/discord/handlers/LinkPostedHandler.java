@@ -14,15 +14,16 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
-	private final static Log LOG = LogFactory.getLog(LinkPostedHandler.class);
+	private final static Log log = LogFactory.getLog(LinkPostedHandler.class);
 
 	private final static String PREFIX_CONFIG = "linkposted.";
 	private static final String NOT_ALLOWED_ROLE = PREFIX_CONFIG + "notallowedrole";
+	private static final String TEMPORARLY_ALLOWED = PREFIX_CONFIG + "temporarlyallowed";
 	private static final String LAST_MESSAGES = PREFIX_CONFIG + "lastmessagestocheck";
 	private final static String REPORT_CHANNEL = PREFIX_CONFIG + "reportchannel";
 	private final static String ACCEPTED_CHANNEL = PREFIX_CONFIG + "acceptedchannel";
@@ -33,26 +34,27 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 
 	@Override
 	public void register(Collection<IHandler<? extends Event>> handles) {
-		LOG.info("Register " + getClass().getSimpleName());
+		log.info("Register " + getClass().getSimpleName());
 		handles.add(this);
 	}
 
 	@Override
 	public void handleEvent(MessageReceivedEvent event) {
 		String message = event.getMessage().getContentDisplay();
-		LOG.info("Handle Message from " + event.getAuthor().getName() + ": " + message);
+		log.info("Handle Message from " + event.getAuthor().getName() + ": " + message);
 		if (isNotInChannel(event.getChannel(), getConfigString(ACCEPTED_CHANNEL))
-				&& (hasRole(event.getMember(), getConfigString(NOT_ALLOWED_ROLE)) || hasNoRole(event.getMember()))) {
-			LOG.info("Handle message");
+				&& (hasRole(event.getMember(), getConfigString(NOT_ALLOWED_ROLE))
+						&& !hasRole(event.getMember(), getConfigString(TEMPORARLY_ALLOWED))
+						|| hasNoRole(event.getMember()))) {
+			log.info("Handle message");
 			String content[] = message.split(" ");
 			UrlValidator validator = new UrlValidator();
 			for (String s : content) {
 				if (validator.isValid(s)) {
-					LOG.info("Link posted from a Unicorn detected!!! Member: " + event.getMember().getEffectiveName()
+					log.info("Link posted from a Unicorn detected!!! Member: " + event.getMember().getEffectiveName()
 							+ " link: " + s);
-					User root = getRootUser(event.getJDA().getUsers());
-					LOG.info("Send the violation to root");
-					sendLinkToRoot(event, root, s);
+					log.info("Send the violation to the violation channel");
+					sendLinkToViolationChannel(event, s);
 					deleteMessage(event, s);
 				}
 			}
@@ -63,15 +65,14 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 		return !channelName.equals(channel.getName());
 	}
 
-	private boolean hasRole(Member member, String roleName) {
-		return member.getRoles().stream()//
-				.filter(r -> r.getName().equals(roleName))//
-				.findFirst()//
-				.isPresent();
-	}
-
 	private boolean hasNoRole(Member member) {
 		return member.getRoles().isEmpty();
+	}
+
+	private void sendLinkToViolationChannel(MessageReceivedEvent event, String s) {
+		TextChannel channel = getTextChannel(event.getGuild(), getConfigString(REPORT_CHANNEL));
+		// TODO find @here mention
+		channel.sendMessage(channel.getAsMention() + " " + event.getAuthor() + " just posted this link: " + s).queue();
 	}
 
 	private Message getToDeleteMessage(Collection<Message> messages, String link) {
@@ -82,30 +83,17 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	}
 
 	private void deleteMessage(MessageReceivedEvent event, String link) {
-		LOG.info("Deleting message containing link");
+		log.info("Deleting message containing link");
 		MessageChannel channel = event.getChannel();
 		MessageHistory history = new MessageHistory(channel);
 		Message message = getToDeleteMessage(history.retrievePast(getConfigInt(LAST_MESSAGES)).complete(), link);
 		if (message != null) {
-			LOG.info("Inform user that he is not allowed to post links");
+			log.info("Inform user that he is not allowed to post links");
 			channel.sendMessage(event.getMember().getAsMention()
 					+ " Bitte keine Links posten danke! Als Unicorn hast du noch keine Berechtigung dazu. "
 					+ "Frage zuerst einer der Space Mods oder die Space Queen.").queue();
 			channel.deleteMessageById(message.getId()).queue();
 		}
-	}
-
-	// FIXME supposed to be a channel
-	private User getRootUser(Collection<User> users) {
-		return users.stream()//
-				.filter(u -> u.getName().equals(getConfigString(REPORT_CHANNEL)))//
-				.findFirst()//
-				.get();
-	}
-
-	private void sendLinkToRoot(MessageReceivedEvent event, User root, String link) {
-		root.openPrivateChannel()
-				.queue(c -> c.sendMessage(event.getAuthor() + " just posted this link: " + link).queue());
 	}
 
 	@Override

@@ -15,7 +15,7 @@ import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent> {
-	private static final Log LOG = LogFactory.getLog(ShutdownCommand.class);
+	private static final Log log = LogFactory.getLog(ShutdownCommand.class);
 
 	private static final String PREFIX_CONFIG = "bot.";
 	private static final String ROOT = PREFIX_CONFIG + "root";
@@ -27,34 +27,34 @@ public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent
 
 	@Override
 	public void register(Collection<IHandler<? extends Event>> handles) {
-		LOG.info("Register " + getClass().getSimpleName());
+		log.info("Register " + getClass().getSimpleName());
 		handles.add(this);
 	}
 
 	@Override
 	public void handleCommand(PrivateMessageReceivedEvent event) {
 		String message = event.getMessage().getContentDisplay();
-		LOG.info("Received private message from " + event.getAuthor().getName() + ": " + message);
-		// TODO maybe clean up a little..
+		log.info("Received private message from " + event.getAuthor().getName() + ": " + message);
+
 		String[] split = message.split(" ");
-		if (split.length == 2 && Command.SHUTDOWN.isCommand(split[0])//
+		if (split.length > 1 && Command.SHUTDOWN.isCommand(split[0])//
 				&& userIsPermitted(event.getAuthor()) && passIsCorrect(split[1])) {
-			LOG.info("Handle message");
-			LOG.info("Going to shut me down ...");
+			log.info("Handle message");
+			log.info("Going to shut me down ...");
 			event.getJDA().shutdown();
-			LOG.info("Kschmidsterbot says bye bye");
+			log.info("Kschmidsterbot says bye bye");
 			return;
 		}
-		LOG.info("Handled private message");
+		log.info("Handled private message");
 	}
 
 	private boolean userIsPermitted(User user) {
-		LOG.debug("Checking if user: " + user.getName() + " is permitted to shut me down");
+		log.debug("Checking if user: " + user.getName() + " is permitted to shut me down");
 		return user.getName().equals(getConfigString(ROOT));
 	}
 
 	private boolean passIsCorrect(String password) {
-		LOG.debug("Checking if the password is correct");
+		log.debug("Checking if the password is correct");
 		return password.equals(getConfigString(PASSWORD));
 	}
 
