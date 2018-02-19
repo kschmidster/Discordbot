@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.handlers;
+package ch.kschmidster.discordbot.handlers;
 
 import java.util.Collection;
 
@@ -8,8 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.routines.UrlValidator;
 
-import ch.kschmidster.kschmidsterbot.discord.core.handler.AbstractHandler;
-import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
+import ch.kschmidster.discordbot.core.handler.AbstractHandler;
+import ch.kschmidster.discordbot.core.handler.IHandler;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;

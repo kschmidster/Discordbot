@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.listeners;
+package ch.kschmidster.discordbot.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +13,7 @@ import org.apache.commons.configuration2.event.EventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
+import ch.kschmidster.discordbot.core.handler.IHandler;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;

@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.core.command;
+package ch.kschmidster.discordbot.core.command;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

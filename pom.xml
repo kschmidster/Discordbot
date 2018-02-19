@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>kschmidsterbot</groupId>
-	<artifactId>discord-kschmidsterbot</artifactId>
+	<artifactId>discordbot</artifactId>
 	<version>0.1.2-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -36,7 +36,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										ch.kschmidster.kschmidsterbot.discord.main.Main
+										ch.kschmidster.discordbot.main.Main
 									</mainClass>
 								</manifest>
 							</archive>
@@ -83,5 +83,4 @@
 			<url>http://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
-
 </project>

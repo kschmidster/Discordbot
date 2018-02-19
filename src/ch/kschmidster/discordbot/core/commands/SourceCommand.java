@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.core.commands;
+package ch.kschmidster.discordbot.core.commands;
 
 import java.util.Collection;
 
@@ -7,9 +7,9 @@ import org.apache.commons.configuration2.event.ConfigurationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ch.kschmidster.kschmidsterbot.discord.core.command.AbstractCommand;
-import ch.kschmidster.kschmidsterbot.discord.core.command.Command;
-import ch.kschmidster.kschmidsterbot.discord.core.handler.IHandler;
+import ch.kschmidster.discordbot.core.command.AbstractCommand;
+import ch.kschmidster.discordbot.core.command.Command;
+import ch.kschmidster.discordbot.core.handler.IHandler;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 

@@ -1,8 +1,8 @@
-package ch.kschmidster.kschmidsterbot.discord.core.command;
+package ch.kschmidster.discordbot.core.command;
 
 import org.apache.commons.configuration2.Configuration;
 
-import ch.kschmidster.kschmidsterbot.discord.core.handler.AbstractHandler;
+import ch.kschmidster.discordbot.core.handler.AbstractHandler;
 import net.dv8tion.jda.core.events.Event;
 
 public abstract class AbstractCommand<E extends Event> extends AbstractHandler<E> {

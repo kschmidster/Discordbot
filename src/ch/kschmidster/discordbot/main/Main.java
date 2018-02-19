@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.main;
+package ch.kschmidster.discordbot.main;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -13,15 +13,15 @@ import org.apache.commons.configuration2.reloading.PeriodicReloadingTrigger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ch.kschmidster.kschmidsterbot.discord.core.commands.PermitUserCommand;
-import ch.kschmidster.kschmidsterbot.discord.core.commands.ShutdownCommand;
-import ch.kschmidster.kschmidsterbot.discord.core.commands.SourceCommand;
-import ch.kschmidster.kschmidsterbot.discord.core.commands.WerIstBodoCommand;
-import ch.kschmidster.kschmidsterbot.discord.handlers.BotGotMentionedHandler;
-import ch.kschmidster.kschmidsterbot.discord.handlers.DiscordOwnerIsStreamingHandler;
-import ch.kschmidster.kschmidsterbot.discord.handlers.LinkPostedHandler;
-import ch.kschmidster.kschmidsterbot.discord.handlers.NewGuildMemberJoinHandler;
-import ch.kschmidster.kschmidsterbot.discord.listeners.MyListenerAdapter;
+import ch.kschmidster.discordbot.core.commands.PermitUserCommand;
+import ch.kschmidster.discordbot.core.commands.ShutdownCommand;
+import ch.kschmidster.discordbot.core.commands.SourceCommand;
+import ch.kschmidster.discordbot.core.commands.WerIstBodoCommand;
+import ch.kschmidster.discordbot.handlers.BotGotMentionedHandler;
+import ch.kschmidster.discordbot.handlers.DiscordOwnerIsStreamingHandler;
+import ch.kschmidster.discordbot.handlers.LinkPostedHandler;
+import ch.kschmidster.discordbot.handlers.NewGuildMemberJoinHandler;
+import ch.kschmidster.discordbot.listeners.MyListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;

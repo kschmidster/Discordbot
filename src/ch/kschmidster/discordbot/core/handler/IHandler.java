@@ -1,4 +1,4 @@
-package ch.kschmidster.kschmidsterbot.discord.core.handler;
+package ch.kschmidster.discordbot.core.handler;
 
 import java.util.Collection;
 
