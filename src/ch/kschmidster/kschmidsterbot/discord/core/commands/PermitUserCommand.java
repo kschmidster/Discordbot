@@ -1,6 +1,7 @@
 package ch.kschmidster.kschmidsterbot.discord.core.commands;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +28,7 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 	private static final int MILLISECONDS = 1000;
 
 	private static final String PREFIX_CONFIG = "permituser.";
-	private static final String PERMITTED_USER = PREFIX_CONFIG + "permitteduser";
+	private static final String PERMITTED_USERS = PREFIX_CONFIG + "permitteduser";
 	private static final String PERMITTED_ROLE = PREFIX_CONFIG + "permitrole";
 	private static final String PERMITTED_TIME = PREFIX_CONFIG + "permittime";
 
@@ -49,7 +50,7 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 		String[] split = message.split(" ");
 		Member member = event.getMember();
 		if (split.length == 2 && Command.PERMIT.isCommand(split[0])) {
-			if (hasRole(member, getConfigString(PERMITTED_USER))) {
+			if (hasRoles(member, getConfigStringList(PERMITTED_USERS))) {
 				log.info("Going to add the permit role to user: " + split[1]);
 				Guild guild = event.getGuild();
 				GuildController guildController = new GuildController(guild);
@@ -67,6 +68,13 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 						+ " du bist nicht berechtig für diesen Command, das können nur Mods.").queue();
 			}
 		}
+	}
+
+	private boolean hasRoles(Member member, List<String> roles) {
+		return member.getRoles().stream()//
+				.filter(r -> roles.contains(r.getName()))//
+				.findFirst()//
+				.isPresent();
 	}
 
 	private Member getMemberToPermit(String member, Guild guild) {

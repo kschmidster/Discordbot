@@ -42,8 +42,9 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 			TextChannel channel = getTextChannel(event.getGuild(), getConfigString(CHANNEL));
 
 			channel.sendMessage("OMG!!!").queue();
-			channel.sendMessage(event.getGuild().getPublicRole().getAsMention() + " "
-					+ event.getMember().getEffectiveName() + " hat gerade ihren Stream gestartet!!!").queue();
+			channel.sendMessage(
+					"@everyone " + event.getMember().getEffectiveName() + " hat gerade ihren Stream gestartet!!!")
+					.queue();
 		}
 	}
 
