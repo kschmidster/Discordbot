@@ -1,8 +1,8 @@
-package ch.kschmidster.discordbot.core.test;
+package ch.kschmidster.discord.bot.core.test;
 
 import org.apache.commons.logging.Log;
 
-public class DiscordbotTest {
+public class DiscordBotTestLoggerHelper {
 
 	public static void logBeforeClass(Log log, Class<?> clazz) {
 		log.info("Starting tests of " + clazz.getSimpleName());

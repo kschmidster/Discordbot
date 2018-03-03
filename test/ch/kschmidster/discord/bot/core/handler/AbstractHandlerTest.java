@@ -1,5 +1,8 @@
-package ch.kschmidster.discordbot.core.handler;
+package ch.kschmidster.discord.bot.core.handler;
 
+import static ch.kschmidster.discord.bot.core.test.DiscordBotTestLoggerHelper.logAfterClass;
+import static ch.kschmidster.discord.bot.core.test.DiscordBotTestLoggerHelper.logBeforeClass;
+import static ch.kschmidster.discord.bot.core.test.DiscordBotTestLoggerHelper.logTest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -23,10 +26,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import static ch.kschmidster.discordbot.core.test.DiscordbotTest.logAfterClass;
-import static ch.kschmidster.discordbot.core.test.DiscordbotTest.logBeforeClass;
-import static ch.kschmidster.discordbot.core.test.DiscordbotTest.logTest;
-
+import ch.kschmidster.discord.bot.core.handler.AbstractHandler;
+import ch.kschmidster.discord.bot.core.handler.IHandler;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;

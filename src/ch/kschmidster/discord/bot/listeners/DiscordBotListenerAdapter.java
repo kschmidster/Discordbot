@@ -1,4 +1,4 @@
-package ch.kschmidster.discordbot.listeners;
+package ch.kschmidster.discord.bot.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +13,7 @@ import org.apache.commons.configuration2.event.EventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ch.kschmidster.discordbot.core.handler.IHandler;
+import ch.kschmidster.discord.bot.core.handler.IHandler;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -21,14 +21,24 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public final class MyListenerAdapter extends ListenerAdapter implements EventListener<ConfigurationEvent> {
-	private final static Log log = LogFactory.getLog(MyListenerAdapter.class);
+public final class DiscordBotListenerAdapter extends ListenerAdapter implements EventListener<ConfigurationEvent> {
+	private final static Log log = LogFactory.getLog(DiscordBotListenerAdapter.class);
+
+	private static final DiscordBotListenerAdapter instance = new DiscordBotListenerAdapter();
 
 	private static final String RECEIVED_EVENT = "Received event %s";
 	private static final String DONE_INVOKING_HANDLERS = "Done invoking the handlers";
 	private static final String INVOKING_HANDLERS = "Invoking the handlers ...";
 
 	private final Collection<IHandler<? extends Event>> handles = new ArrayList<>();
+
+	private DiscordBotListenerAdapter() {
+		// no public instantiation, so it is easier for testing
+	}
+
+	public static DiscordBotListenerAdapter instance() {
+		return instance;
+	}
 
 	public void registerHandle(IHandler<? extends Event> handle) {
 		handle.register(handles);

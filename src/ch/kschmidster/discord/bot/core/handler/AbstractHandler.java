@@ -1,4 +1,4 @@
-package ch.kschmidster.discordbot.core.handler;
+package ch.kschmidster.discord.bot.core.handler;
 
 import java.util.Arrays;
 import java.util.List;

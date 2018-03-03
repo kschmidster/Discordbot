@@ -1,4 +1,4 @@
-package ch.kschmidster.discordbot.main;
+package ch.kschmidster.discord.bot.main;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -13,20 +13,20 @@ import org.apache.commons.configuration2.reloading.PeriodicReloadingTrigger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ch.kschmidster.discordbot.core.commands.PermitUserCommand;
-import ch.kschmidster.discordbot.core.commands.ShutdownCommand;
-import ch.kschmidster.discordbot.core.commands.SourceCommand;
-import ch.kschmidster.discordbot.core.commands.WerIstBodoCommand;
-import ch.kschmidster.discordbot.handlers.BotGotMentionedHandler;
-import ch.kschmidster.discordbot.handlers.DiscordOwnerIsStreamingHandler;
-import ch.kschmidster.discordbot.handlers.LinkPostedHandler;
-import ch.kschmidster.discordbot.handlers.NewGuildMemberJoinHandler;
-import ch.kschmidster.discordbot.listeners.MyListenerAdapter;
+import ch.kschmidster.discord.bot.commands.PermitUserCommand;
+import ch.kschmidster.discord.bot.commands.ShutdownCommand;
+import ch.kschmidster.discord.bot.commands.SourceCommand;
+import ch.kschmidster.discord.bot.commands.WerIstBodoCommand;
+import ch.kschmidster.discord.bot.handlers.BotGotMentionedHandler;
+import ch.kschmidster.discord.bot.handlers.DiscordOwnerIsStreamingHandler;
+import ch.kschmidster.discord.bot.handlers.LinkPostedHandler;
+import ch.kschmidster.discord.bot.handlers.NewGuildMemberJoinHandler;
+import ch.kschmidster.discord.bot.listeners.DiscordBotListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 
-public class Main {
+public final class Main {
 	private static final Log log = LogFactory.getLog(Main.class);
 
 	private static final String CONFIG_PROPERTIES = "config.properties";
@@ -105,17 +105,17 @@ public class Main {
 		}
 	}
 
-	private static void initializeDiscordBot(JDA jda,
+	protected static void initializeDiscordBot(JDA jda,
 			ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> builder, Configuration configuration) {
 		log.info("Add Listener");
-		MyListenerAdapter myListenerAdapter = new MyListenerAdapter();
+		DiscordBotListenerAdapter myListenerAdapter = DiscordBotListenerAdapter.instance();
 		myListenerAdapter.registerTo(builder);
 		jda.addEventListener(myListenerAdapter);
 		registerHandles(myListenerAdapter, configuration);
 		registerCommands(myListenerAdapter, configuration);
 	}
 
-	private static void registerHandles(MyListenerAdapter myListenerAdapter, Configuration configuration) {
+	protected static void registerHandles(DiscordBotListenerAdapter myListenerAdapter, Configuration configuration) {
 		log.info("Register all handles");
 		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler(configuration));
 		myListenerAdapter.registerHandle(new LinkPostedHandler(configuration));
@@ -123,7 +123,7 @@ public class Main {
 		myListenerAdapter.registerHandle(new BotGotMentionedHandler(configuration));
 	}
 
-	private static void registerCommands(MyListenerAdapter myListenerAdapter, Configuration configuration) {
+	protected static void registerCommands(DiscordBotListenerAdapter myListenerAdapter, Configuration configuration) {
 		log.info("Register all commands");
 		myListenerAdapter.registerHandle(new ShutdownCommand(configuration));
 		myListenerAdapter.registerHandle(new WerIstBodoCommand(configuration));
