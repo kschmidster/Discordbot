@@ -40,7 +40,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										ch.kschmidster.discordbot.main.Main
+										ch.kschmidster.discord.bot.main.Main
 									</mainClass>
 								</manifest>
 							</archive>
