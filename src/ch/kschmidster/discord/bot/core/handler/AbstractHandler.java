@@ -75,4 +75,11 @@ public abstract class AbstractHandler<E extends Event> implements IHandler<E> {
 		return configuration;
 	}
 
+	protected boolean isNotAnswer(String message, List<String> answers) {
+		return !answers.stream()//
+				.filter(s -> s.equals(message))//
+				.findFirst()//
+				.isPresent();
+	}
+
 }

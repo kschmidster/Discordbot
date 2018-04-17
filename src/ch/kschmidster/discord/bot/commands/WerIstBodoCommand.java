@@ -37,18 +37,11 @@ public class WerIstBodoCommand extends AbstractCommand<MessageReceivedEvent> {
 	public void handleCommand(MessageReceivedEvent event) {
 		String message = event.getMessage().getContentDisplay();
 		log.info("Handle message " + message);
-		if (PATTERN.matcher(message).find() && isNotAnswer(message)) {
+		if (PATTERN.matcher(message).find() && isNotAnswer(message, getConfigStringList(ANSWERS))) {
 			log.info("Contains bodo");
 			List<String> answers = getConfigStringList(ANSWERS);
 			event.getChannel().sendMessage(getRandomString(answers)).queue();
 		}
-	}
-
-	private boolean isNotAnswer(String message) {
-		return !getConfigStringList(ANSWERS).stream()//
-				.filter(s -> s.equals(message))//
-				.findFirst()//
-				.isPresent();
 	}
 
 	@Override

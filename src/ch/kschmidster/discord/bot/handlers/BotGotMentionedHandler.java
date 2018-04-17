@@ -36,7 +36,8 @@ public class BotGotMentionedHandler extends AbstractHandler<MessageReceivedEvent
 		String message = event.getMessage().getContentDisplay();
 		log.info("Handle message " + message);
 
-		if (message.contains(getMember(event.getGuild(), getConfigString(BOT_NAME)).getEffectiveName())) {
+		if (message.contains(getMember(event.getGuild(), getConfigString(BOT_NAME)).getEffectiveName())
+				&& isNotAnswer(message, getConfigStringList(ANSWERS))) {
 			event.getChannel().sendMessage(getPreparedRandomAnswer(event)).queue();
 		}
 	}
