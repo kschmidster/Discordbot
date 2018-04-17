@@ -26,6 +26,8 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 public class RoleUpgradeHandler extends AbstractHandler<GuildMemberRoleAddEvent> {
 	private final static Log log = LogFactory.getLog(RoleUpgradeHandler.class);
 
+	private static final int DELAY = 3000;
+	// FIXME issues with the "cache" when roles get removed
 	private final Map<String, List<Role>> rolesOfMember;
 
 	private RoleUpgradeHandler(Map<String, List<Role>> memberRoles, Configuration configuration) {
@@ -42,36 +44,40 @@ public class RoleUpgradeHandler extends AbstractHandler<GuildMemberRoleAddEvent>
 	@Override
 	public void handleEvent(GuildMemberRoleAddEvent event) {
 		Member member = event.getMember();
-		List<Role> roles = event.getRoles();
-		List<Role> newRoles = rolesOfMember.get(member.getEffectiveName());
+		// seems like it contains only the new role
+		Role newRole = event.getRoles().get(0);
+		Role oldRole = getHighestRole(rolesOfMember.get(member.getEffectiveName()));
 
-		if (newRoles.size() > roles.size() && addedRoleIsBetter(roles, newRoles)) {
-			scheduleTimerTask(event, member, newRoles);
+		if (newRole.compareTo(oldRole) > 0) {
+			scheduleTimerTask(event, member, newRole);
 		}
 	}
 
-	private void scheduleTimerTask(GuildMemberRoleAddEvent event, Member member, List<Role> newRoles) {
+	private void scheduleTimerTask(GuildMemberRoleAddEvent event, Member member, Role newRole) {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				List<Role> currentRoles = event.getGuild().getMemberById(member.getUser().getIdLong()).getRoles();
 				Role currentHighestRole = getHighestRole(currentRoles);
-				Role newHighestRole = getHighestRole(newRoles);
-				if (currentHighestRole.compareTo(newHighestRole) >= 0) {
-					TextChannel textChannel = getTextChannel(event.getGuild(),
-							getConfigString("newguildmemberjoin.channel"));
-					textChannel.sendMessage("Looks like " + member.getAsMention() + " got promoted!!").queue();
-					textChannel
-							.sendMessage(
-									"Welcome " + member.getAsMention() + " to the " + newHighestRole.getAsMention())
-							.queue();
+				if (currentHighestRole.compareTo(newRole) >= 0) {
+					congratMember(event, member, newRole);
 				}
+				// cache update
+				rolesOfMember.put(member.getEffectiveName(), getRoles(event.getGuild(), member));
 			}
-		}, 3000);
+
+			private void congratMember(GuildMemberRoleAddEvent event, Member member, Role newRole) {
+				TextChannel textChannel = getTextChannel(event.getGuild(),
+						getConfigString("newguildmemberjoin.channel"));
+				textChannel.sendMessage("Looks like " + member.getAsMention() + " got promoted!!").queue();
+				textChannel.sendMessage("Welcome " + member.getAsMention() + " to the " + newRole.getAsMention() + "s")
+						.queue();
+			}
+		}, DELAY);
 	}
 
-	private boolean addedRoleIsBetter(List<Role> roles, List<Role> newRoles) {
-		return getHighestRole(newRoles).compareTo(getHighestRole(roles)) > 0;
+	private List<Role> getRoles(Guild guild, Member member) {
+		return guild.getMemberById(member.getUser().getIdLong()).getRoles();
 	}
 
 	private Role getHighestRole(List<Role> roles) {
@@ -99,7 +105,7 @@ public class RoleUpgradeHandler extends AbstractHandler<GuildMemberRoleAddEvent>
 
 		private static Guild getGuild(JDA jda, Configuration configuration) {
 			return jda.getGuilds().stream()//
-					.filter(g -> g.getId().equals(configuration.getString("newguildmemberjoin.channel")))//
+					.filter(g -> g.getName().equals(configuration.getString("roleupgradehandler.guild")))//
 					.findFirst()//
 					.get();
 		}

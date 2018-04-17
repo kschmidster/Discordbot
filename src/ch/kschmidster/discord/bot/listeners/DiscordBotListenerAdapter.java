@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import ch.kschmidster.discord.bot.core.handler.IHandler;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
@@ -86,6 +87,17 @@ public final class DiscordBotListenerAdapter extends ListenerAdapter implements 
 		log.debug(INVOKING_HANDLERS);
 		if (notNull(event.getCurrentGame())) {
 			getHandlers(UserGameUpdateEvent.class)//
+					.forEach(h -> h.handleEvent(event));
+		}
+		log.debug(DONE_INVOKING_HANDLERS);
+	}
+
+	@Override
+	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+		log.debug(String.format(RECEIVED_EVENT, "GuildMemberRoleAddEvent"));
+		log.debug(INVOKING_HANDLERS);
+		if (notNull(event.getMember())) {
+			getHandlers(GuildMemberRoleAddEvent.class)//
 					.forEach(h -> h.handleEvent(event));
 		}
 		log.debug(DONE_INVOKING_HANDLERS);
