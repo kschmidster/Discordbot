@@ -11,7 +11,6 @@ import ch.kschmidster.discord.bot.core.handler.AbstractHandler;
 import ch.kschmidster.discord.bot.core.handler.IHandler;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.entities.Game.GameType;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.user.UserGameUpdateEvent;
@@ -22,6 +21,8 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 	private final static String PREFIX_CONFIG = "discordownerisstreaming.";
 	private static final String DISCORD_OWNER = PREFIX_CONFIG + "discordOwner";
 	private final static String CHANNEL = PREFIX_CONFIG + "channel";
+
+	private static GameType state = GameType.DEFAULT;
 
 	public DiscordOwnerIsStreamingHandler(Configuration configuration) {
 		super(UserGameUpdateEvent.class, configuration);
@@ -37,10 +38,8 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 	public void handleEvent(UserGameUpdateEvent event) {
 		log.debug("Handle game update");
 		Game currentGame = event.getCurrentGame();
-		if (GameType.STREAMING.equals(currentGame.getType())//
+		if (!alreadyStreaming() && GameType.STREAMING.equals(currentGame.getType())//
 				&& isDiscordOwner(event)) {
-			logCheckAlreadyStreaming(event);
-
 			log.info("Discord owner is streaming");
 			TextChannel channel = getTextChannel(event.getGuild(), getConfigString(CHANNEL));
 
@@ -49,21 +48,15 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 					"@everyone " + event.getMember().getEffectiveName() + " hat gerade ihren Stream gestartet!!!")
 					.queue();
 		}
+		if (isDiscordOwner(event) && state != currentGame.getType()) {
+			log.info(
+					"Set new discord owner is streaming state, was: " + state + " change to: " + currentGame.getType());
+			state = currentGame.getType();
+		}
 	}
 
-	// TODO remove if analyzed
-	private void logCheckAlreadyStreaming(UserGameUpdateEvent event) {
-		// check if currentGame was already streaming. Gets also called if name
-		// gets changed
-		Member member = event.getGuild().getMembers().stream()//
-				.filter(m -> m.getEffectiveName().equals(getConfigString(DISCORD_OWNER)))//
-				.findFirst()//
-				.get();
-		GameType type = member.getGame().getType();
-		boolean renamedStream = type.equals(GameType.STREAMING);
-		log.info("GameType from Member: " + type.name() + " GameType from Event: "
-				+ event.getCurrentGame().getType().name());
-		log.info("So, discord owner was only renaming the stream: " + renamedStream);
+	private boolean alreadyStreaming() {
+		return GameType.STREAMING == state;
 	}
 
 	private boolean isDiscordOwner(UserGameUpdateEvent event) {

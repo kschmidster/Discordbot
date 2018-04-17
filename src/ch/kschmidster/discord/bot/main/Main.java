@@ -21,6 +21,7 @@ import ch.kschmidster.discord.bot.handlers.BotGotMentionedHandler;
 import ch.kschmidster.discord.bot.handlers.DiscordOwnerIsStreamingHandler;
 import ch.kschmidster.discord.bot.handlers.LinkPostedHandler;
 import ch.kschmidster.discord.bot.handlers.NewGuildMemberJoinHandler;
+import ch.kschmidster.discord.bot.handlers.RoleUpgradeHandler.RoleUpgradeHandlerCreator;
 import ch.kschmidster.discord.bot.listeners.DiscordBotListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -111,16 +112,18 @@ public final class Main {
 		DiscordBotListenerAdapter myListenerAdapter = DiscordBotListenerAdapter.instance();
 		myListenerAdapter.registerTo(builder);
 		jda.addEventListener(myListenerAdapter);
-		registerHandles(myListenerAdapter, configuration);
+		registerHandles(jda, myListenerAdapter, configuration);
 		registerCommands(myListenerAdapter, configuration);
 	}
 
-	protected static void registerHandles(DiscordBotListenerAdapter myListenerAdapter, Configuration configuration) {
+	protected static void registerHandles(JDA jda, DiscordBotListenerAdapter myListenerAdapter,
+			Configuration configuration) {
 		log.info("Register all handles");
 		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler(configuration));
 		myListenerAdapter.registerHandle(new LinkPostedHandler(configuration));
 		myListenerAdapter.registerHandle(new DiscordOwnerIsStreamingHandler(configuration));
 		myListenerAdapter.registerHandle(new BotGotMentionedHandler(configuration));
+		myListenerAdapter.registerHandle(RoleUpgradeHandlerCreator.create(jda, configuration));
 	}
 
 	protected static void registerCommands(DiscordBotListenerAdapter myListenerAdapter, Configuration configuration) {

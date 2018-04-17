@@ -26,8 +26,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import ch.kschmidster.discord.bot.core.handler.AbstractHandler;
-import ch.kschmidster.discord.bot.core.handler.IHandler;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
@@ -49,7 +47,7 @@ public class AbstractHandlerTest {
 	private final AbstractHandler<Event> handler = createAbstractHandler(configuration);
 
 	@BeforeClass
-	public static void classSetup() {
+	public static void setUpClass() {
 		logBeforeClass(log, AbstractHandlerTest.class);
 	}
 

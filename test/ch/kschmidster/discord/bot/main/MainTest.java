@@ -1,5 +1,7 @@
 package ch.kschmidster.discord.bot.main;
 
+import static ch.kschmidster.discord.bot.core.test.DiscordBotTestLoggerHelper.logAfterClass;
+import static ch.kschmidster.discord.bot.core.test.DiscordBotTestLoggerHelper.logBeforeClass;
 import static ch.kschmidster.discord.bot.core.test.DiscordBotTestLoggerHelper.logTest;
 import static org.junit.Assert.fail;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -12,10 +14,10 @@ import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.builder.ReloadingFileBasedConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,11 +28,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.kschmidster.discord.bot.handlers.RoleUpgradeHandler;
+import ch.kschmidster.discord.bot.handlers.RoleUpgradeHandler.RoleUpgradeHandlerCreator;
 import ch.kschmidster.discord.bot.listeners.DiscordBotListenerAdapter;
 import net.dv8tion.jda.core.JDA;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(DiscordBotListenerAdapter.class)
+@PrepareForTest({ DiscordBotListenerAdapter.class, RoleUpgradeHandlerCreator.class })
 public class MainTest {
 	private final static Log log = LogFactory.getLog(MainTest.class);
 
@@ -44,6 +48,8 @@ public class MainTest {
 
 	@BeforeClass
 	public static void setUpClass() {
+		logBeforeClass(log, MainTest.class);
+
 		NO_OF_HANDLES = getDirectory(PATH_HANDLERS).listFiles().length;
 		NO_OF_COMMANDS = getDirectory(PATH_COMMANDS).listFiles().length;
 	}
@@ -62,11 +68,16 @@ public class MainTest {
 	public void testRegisterMyListenerAdapter() {
 		logTest(log, "testRegisterMyListenerAdapter");
 
+		mockStatic(RoleUpgradeHandlerCreator.class);
+
 		JDA jda = mock(JDA.class);
 		@SuppressWarnings("unchecked")
 		ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> builder = mock(
 				ReloadingFileBasedConfigurationBuilder.class);
 		Configuration configuration = mock(Configuration.class);
+		RoleUpgradeHandler roleUpgradeHandler = mock(RoleUpgradeHandler.class);
+
+		when(RoleUpgradeHandlerCreator.create(jda, configuration)).thenReturn(roleUpgradeHandler);
 
 		Main.initializeDiscordBot(jda, builder, configuration);
 
@@ -74,13 +85,19 @@ public class MainTest {
 	}
 
 	@Test
-	public void testRegisterHandles() {
+	public void testRegisterHandles() throws Exception {
 		logTest(log, "testRegisterHandles");
 
-		DiscordBotListenerAdapter listener = PowerMockito.mock(DiscordBotListenerAdapter.class);
-		Configuration configuration = mock(Configuration.class);
+		mockStatic(RoleUpgradeHandlerCreator.class);
 
-		Main.registerHandles(listener, configuration);
+		JDA jda = mock(JDA.class);
+		DiscordBotListenerAdapter listener = mock(DiscordBotListenerAdapter.class);
+		Configuration configuration = mock(Configuration.class);
+		RoleUpgradeHandler roleUpgradeHandler = mock(RoleUpgradeHandler.class);
+
+		when(RoleUpgradeHandlerCreator.create(jda, configuration)).thenReturn(roleUpgradeHandler);
+
+		Main.registerHandles(jda, listener, configuration);
 
 		verify(listener, times(NO_OF_HANDLES)).registerHandle(any());
 	}
@@ -89,7 +106,7 @@ public class MainTest {
 	public void testRegisterCommands() {
 		logTest(log, "testRegisterCommands");
 
-		DiscordBotListenerAdapter listener = PowerMockito.mock(DiscordBotListenerAdapter.class);
+		DiscordBotListenerAdapter listener = mock(DiscordBotListenerAdapter.class);
 		Configuration configuration = mock(Configuration.class);
 
 		Main.registerCommands(listener, configuration);
@@ -102,19 +119,27 @@ public class MainTest {
 		logTest(log, "testCallRegisterHandlesAndCommands");
 
 		mockStatic(DiscordBotListenerAdapter.class);
-
-		DiscordBotListenerAdapter listener = PowerMockito.mock(DiscordBotListenerAdapter.class);
-		when(DiscordBotListenerAdapter.instance()).thenReturn(listener);
+		mockStatic(RoleUpgradeHandlerCreator.class);
 
 		JDA jda = mock(JDA.class);
 		@SuppressWarnings("unchecked")
 		ReloadingFileBasedConfigurationBuilder<FileBasedConfiguration> builder = mock(
 				ReloadingFileBasedConfigurationBuilder.class);
 		Configuration configuration = mock(Configuration.class);
+		DiscordBotListenerAdapter listener = mock(DiscordBotListenerAdapter.class);
+		RoleUpgradeHandler roleUpgradeHandler = mock(RoleUpgradeHandler.class);
+
+		when(DiscordBotListenerAdapter.instance()).thenReturn(listener);
+		when(RoleUpgradeHandlerCreator.create(jda, configuration)).thenReturn(roleUpgradeHandler);
 
 		Main.initializeDiscordBot(jda, builder, configuration);
 
 		verify(listener, times(NO_OF_HANDLES + NO_OF_COMMANDS)).registerHandle(any());
+	}
+
+	@AfterClass
+	public static void classTearDown() {
+		logAfterClass(log, MainTest.class);
 	}
 
 }
