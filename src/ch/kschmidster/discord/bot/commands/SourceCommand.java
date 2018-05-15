@@ -31,11 +31,11 @@ public class SourceCommand extends AbstractCommand<MessageReceivedEvent> {
 
 	@Override
 	public void handleCommand(MessageReceivedEvent event) {
-		String message = event.getMessage().getContentDisplay();
-		log.info("Handle message " + message);
+		log.debug("Handle message " + getContentDisplay(event));
 
-		String[] split = message.split(" ");
+		String[] split = getContentDisplay(event).split(" ");
 		if (split.length > 0 && Command.SOURCE.isCommand(split[0])) {
+			log.info(getEffectiveName(event) + " will meinen Source Code sehen");
 			event.getChannel().sendMessage("Mein Source Code findet ihr auf " + getConfigString(SOURCE)).queue();
 		}
 	}

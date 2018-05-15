@@ -14,15 +14,12 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	private final static Log log = LogFactory.getLog(LinkPostedHandler.class);
-
-	private static final String SPACE_MOD = "Space Mod";
 
 	private final static String PREFIX_CONFIG = "linkposted.";
 	private static final String NOT_ALLOWED_ROLE = PREFIX_CONFIG + "notallowedrole";
@@ -43,8 +40,8 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 
 	@Override
 	public void handleEvent(MessageReceivedEvent event) {
-		String message = event.getMessage().getContentDisplay();
-		log.info("Handle Message from " + event.getAuthor().getName() + ": " + message);
+		String message = getContentDisplay(event);
+		log.debug("Handle Message from " + getEffectiveName(event) + ": " + message);
 		if (isNotInChannel(event.getChannel(), getConfigString(ACCEPTED_CHANNEL))
 				&& (hasRole(event.getMember(), getConfigString(NOT_ALLOWED_ROLE))
 						&& !hasRole(event.getMember(), getConfigString(TEMPORARLY_ALLOWED))
@@ -74,16 +71,7 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 
 	private void sendLinkToViolationChannel(MessageReceivedEvent event, String link) {
 		TextChannel channel = getTextChannel(event.getGuild(), getConfigString(REPORT_CHANNEL));
-		channel.sendMessage(
-				getRole(event, SPACE_MOD).getAsMention() + " " + event.getAuthor() + " just posted this link: " + link)
-				.queue();
-	}
-
-	private Role getRole(MessageReceivedEvent event, String role) {
-		return event.getGuild().getRoles().stream()//
-				.filter(r -> r.getName().equals(role))//
-				.findFirst()//
-				.get();
+		channel.sendMessage("@everyone " + event.getAuthor() + " just posted this link: " + link).queue();
 	}
 
 	private Message getToDeleteMessage(Collection<Message> messages, String link) {
@@ -94,7 +82,7 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 	}
 
 	private void deleteMessage(MessageReceivedEvent event, String link) {
-		log.info("Deleting message containing link");
+		log.debug("Deleting message containing link");
 		MessageChannel channel = event.getChannel();
 		MessageHistory history = new MessageHistory(channel);
 		Message message = getToDeleteMessage(history.retrievePast(getConfigInt(LAST_MESSAGES)).complete(), link);

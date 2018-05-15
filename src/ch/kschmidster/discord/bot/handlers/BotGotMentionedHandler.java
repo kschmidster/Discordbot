@@ -33,11 +33,11 @@ public class BotGotMentionedHandler extends AbstractHandler<MessageReceivedEvent
 
 	@Override
 	public void handleEvent(MessageReceivedEvent event) {
-		String message = event.getMessage().getContentDisplay();
-		log.info("Handle message " + message);
+		String message = getContentDisplay(event);
+		log.debug("Handle message " + message);
 
-		if (message.contains(getMember(event.getGuild(), getConfigString(BOT_NAME)).getEffectiveName())
-				&& isNotAnswer(message, getConfigStringList(ANSWERS))) {
+		if (message.contains(getMember(event.getGuild(), getConfigString(BOT_NAME)).getEffectiveName())) {
+			log.info(getEffectiveName(event) + " mentioned me :D");
 			event.getChannel().sendMessage(getPreparedRandomAnswer(event)).queue();
 		}
 	}

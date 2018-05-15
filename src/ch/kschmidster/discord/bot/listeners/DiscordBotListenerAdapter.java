@@ -53,54 +53,72 @@ public final class DiscordBotListenerAdapter extends ListenerAdapter implements 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 		log.debug(String.format(RECEIVED_EVENT, "MessageReceivedEvent"));
-		if (notNull(event.getGuild(), event.getChannel())) {
-			log.debug(INVOKING_HANDLERS);
+		if (eventNotFromBot(event) && notNull(event.getGuild(), event.getChannel())) {
+			log.trace(INVOKING_HANDLERS);
 			getHandlers(MessageReceivedEvent.class)//
 					.forEach(h -> h.handleEvent(event));
-			log.debug(DONE_INVOKING_HANDLERS);
+			log.trace(DONE_INVOKING_HANDLERS);
 		}
 	}
 
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
 		log.debug(String.format(RECEIVED_EVENT, "PrivateMessageReceivedEvent"));
-		log.debug(INVOKING_HANDLERS);
-		getHandlers(PrivateMessageReceivedEvent.class)//
-				.forEach(h -> h.handleEvent(event));
-		log.debug(DONE_INVOKING_HANDLERS);
+		log.trace(INVOKING_HANDLERS);
+		if (eventNotFromBot(event)) {
+			getHandlers(PrivateMessageReceivedEvent.class)//
+					.forEach(h -> h.handleEvent(event));
+		}
+		log.trace(DONE_INVOKING_HANDLERS);
+	}
+
+	private boolean eventNotFromBot(Event event) {
+		if (event instanceof MessageReceivedEvent) {
+			return !((MessageReceivedEvent) event).getAuthor().isBot();
+		}
+		if (event instanceof PrivateMessageReceivedEvent) {
+			return !((PrivateMessageReceivedEvent) event).getAuthor().isBot();
+		}
+		log.warn(event.getClass() + " has no check for is message from bot");
+		return false;
 	}
 
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		log.debug(String.format(RECEIVED_EVENT, "GuildMemberJoinEvent"));
 		if (notNull(event.getGuild(), event.getMember())) {
-			log.debug(INVOKING_HANDLERS);
+			log.trace(INVOKING_HANDLERS);
 			getHandlers(GuildMemberJoinEvent.class)//
 					.forEach(h -> h.handleEvent(event));
-			log.debug(DONE_INVOKING_HANDLERS);
+			log.trace(DONE_INVOKING_HANDLERS);
 		}
 	}
 
 	@Override
 	public void onUserGameUpdate(UserGameUpdateEvent event) {
 		log.debug(String.format(RECEIVED_EVENT, "UserGameUpdateEvent"));
-		log.debug(INVOKING_HANDLERS);
+		log.trace(INVOKING_HANDLERS);
 		if (notNull(event.getCurrentGame())) {
 			getHandlers(UserGameUpdateEvent.class)//
 					.forEach(h -> h.handleEvent(event));
 		}
-		log.debug(DONE_INVOKING_HANDLERS);
+		log.trace(DONE_INVOKING_HANDLERS);
 	}
 
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
 		log.debug(String.format(RECEIVED_EVENT, "GuildMemberRoleAddEvent"));
-		log.debug(INVOKING_HANDLERS);
+		log.trace(INVOKING_HANDLERS);
 		if (notNull(event.getMember())) {
 			getHandlers(GuildMemberRoleAddEvent.class)//
 					.forEach(h -> h.handleEvent(event));
 		}
-		log.debug(DONE_INVOKING_HANDLERS);
+		log.trace(DONE_INVOKING_HANDLERS);
+	}
+
+	@Override
+	public void onEvent(ConfigurationEvent event) {
+		handles.forEach(h -> h.updateConfigs(event));
 	}
 
 	private boolean notNull(Object... objects) {
@@ -114,11 +132,6 @@ public final class DiscordBotListenerAdapter extends ListenerAdapter implements 
 		return handles.stream()//
 				.filter(h -> clazz.equals(h.getGenericType()))//
 				.map(IHandler.class::cast);
-	}
-
-	@Override
-	public void onEvent(ConfigurationEvent event) {
-		handles.forEach(h -> h.updateConfigs(event));
 	}
 
 }

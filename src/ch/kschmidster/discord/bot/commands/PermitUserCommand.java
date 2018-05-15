@@ -44,11 +44,11 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 
 	@Override
 	public void handleCommand(MessageReceivedEvent event) {
-		String message = event.getMessage().getContentDisplay();
-		log.info("Handle message " + message);
+		log.debug("Handle message " + getContentDisplay(event));
 
-		String[] split = message.split(" ");
+		String[] split = getContentDisplay(event).split(" ");
 		Member member = event.getMember();
+
 		if (split.length == 2 && Command.PERMIT.isCommand(split[0])) {
 			if (hasRoles(member, getConfigStringList(PERMITTED_USERS))) {
 				log.info("Going to add the permit role to user: " + split[1]);
@@ -64,6 +64,7 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 							+ " nicht in der Datenbank finden!").queue();
 				}
 			} else {
+				log.info(member.getEffectiveName() + " tried to permit " + split[1] + " to permit to post a link");
 				event.getChannel().sendMessage(event.getMember().getAsMention()
 						+ " du bist nicht berechtig für diesen Command, das können nur Mods.").queue();
 			}
@@ -92,7 +93,7 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 
 		MessageChannel channel = event.getChannel();
 		scheduleRemovePermitRole(guildController, memberToPermit, permittedRole, channel);
-		log.info("User: " + memberToPermit.getEffectiveName() + " is now permitted to post links or pictures for "
+		log.debug(memberToPermit.getEffectiveName() + " is now permitted to post links or pictures for "
 				+ getConfigInt(PERMITTED_TIME) + "s");
 		channel.sendMessage(memberToPermit.getAsMention() + " du kannst jetzt innerhalb von "
 				+ getConfigInt(PERMITTED_TIME) + "s einen Link oder Bild posten!").queue();
@@ -103,6 +104,7 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
+				log.debug("Remove permission for user " + tempPermittedMember.getEffectiveName() + " to post links");
 				guildController.removeSingleRoleFromMember(tempPermittedMember, permittedRole).queue();
 				channel.sendMessage(tempPermittedMember.getAsMention()
 						+ " du deine Berechtigung um Links zu posten ist abgelaufen.").queue();

@@ -9,7 +9,7 @@ public enum Command {
 	PERMIT("permit"), //
 	SOURCE("source");
 
-	private final static Log LOG = LogFactory.getLog(Command.class);
+	private final static Log log = LogFactory.getLog(Command.class);
 
 	private final static String PREFIX = "!";
 	private final String name;
@@ -19,9 +19,9 @@ public enum Command {
 	}
 
 	public boolean isCommand(String commandName) {
-		LOG.debug("Checking if " + name + " is same as " + commandName);
+		log.debug("Checking if " + name + " is same as " + commandName);
 		if (commandName != null && commandName.startsWith(PREFIX)) {
-			LOG.info("Is command " + commandName);
+			log.debug("Is command " + commandName);
 			return commandName.substring(1, commandName.length()).equals(name);
 		}
 		return false;

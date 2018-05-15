@@ -38,7 +38,7 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 	public void handleEvent(UserGameUpdateEvent event) {
 		log.debug("Handle game update");
 		Game currentGame = event.getCurrentGame();
-		if (!alreadyStreaming() && GameType.STREAMING.equals(currentGame.getType())//
+		if (!alreadyStreaming() && GameType.STREAMING == currentGame.getType()//
 				&& isDiscordOwner(event)) {
 			log.info("Discord owner is streaming");
 			TextChannel channel = getTextChannel(event.getGuild(), getConfigString(CHANNEL));
@@ -49,7 +49,7 @@ public class DiscordOwnerIsStreamingHandler extends AbstractHandler<UserGameUpda
 					.queue();
 		}
 		if (isDiscordOwner(event) && state != currentGame.getType()) {
-			log.info(
+			log.debug(
 					"Set new discord owner is streaming state, was: " + state + " change to: " + currentGame.getType());
 			state = currentGame.getType();
 		}

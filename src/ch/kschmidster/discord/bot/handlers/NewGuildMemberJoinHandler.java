@@ -35,7 +35,7 @@ public class NewGuildMemberJoinHandler extends AbstractHandler<GuildMemberJoinEv
 
 	@Override
 	public void handleEvent(GuildMemberJoinEvent event) {
-		log.info("Handle new member join");
+		log.debug("Handle new member join");
 		Guild guild = event.getGuild();
 		TextChannel channel = getTextChannel(guild, getConfigString(CHANNEL));
 		Member member = event.getMember();

@@ -34,18 +34,16 @@ public class ShutdownCommand extends AbstractCommand<PrivateMessageReceivedEvent
 	@Override
 	public void handleCommand(PrivateMessageReceivedEvent event) {
 		String message = event.getMessage().getContentDisplay();
-		log.info("Received private message from " + event.getAuthor().getName() + ": " + message);
+		log.debug("Received private message from " + event.getAuthor().getName() + ": " + message);
 
 		String[] split = message.split(" ");
 		if (split.length > 1 && Command.SHUTDOWN.isCommand(split[0])//
 				&& userIsPermitted(event.getAuthor()) && passIsCorrect(split[1])) {
-			log.info("Handle message");
 			log.info("Going to shut me down ...");
 			event.getJDA().shutdown();
 			log.info("Kschmidsterbot says bye bye");
 			return;
 		}
-		log.info("Handled private message");
 	}
 
 	private boolean userIsPermitted(User user) {

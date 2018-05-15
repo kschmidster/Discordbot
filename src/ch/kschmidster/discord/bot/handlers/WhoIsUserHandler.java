@@ -1,4 +1,4 @@
-package ch.kschmidster.discord.bot.commands;
+package ch.kschmidster.discord.bot.handlers;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,17 +14,23 @@ import ch.kschmidster.discord.bot.core.handler.IHandler;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-public class WerIstBodoCommand extends AbstractCommand<MessageReceivedEvent> {
-	private final static Log log = LogFactory.getLog(WerIstBodoCommand.class);
+public class WhoIsUserHandler extends AbstractCommand<MessageReceivedEvent> {
+	private final static Log log = LogFactory.getLog(WhoIsUserHandler.class);
 
-	private static final String PREFIX_CONFIG = "weristbodo.";
+	private static final String PREFIX_CONFIG = "whoisuser.";
+	private static final String USER = PREFIX_CONFIG + "user";
 	private static final String ANSWERS = PREFIX_CONFIG + "answers";
 
-	private final static String REGEX = "b+o+d+o+";
-	private final static Pattern PATTERN = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
+	private final String REGEX;
+	private final Pattern PATTERN;
 
-	public WerIstBodoCommand(Configuration configuration) {
+	public WhoIsUserHandler(Configuration configuration) {
 		super(MessageReceivedEvent.class, configuration);
+
+		REGEX = getConfigString(USER).trim().chars()//
+				.collect(StringBuilder::new, (sb, i) -> sb.append((char) i).append('+'), StringBuilder::append)//
+				.toString();
+		PATTERN = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
 	}
 
 	@Override
@@ -35,10 +41,10 @@ public class WerIstBodoCommand extends AbstractCommand<MessageReceivedEvent> {
 
 	@Override
 	public void handleCommand(MessageReceivedEvent event) {
-		String message = event.getMessage().getContentDisplay();
-		log.info("Handle message " + message);
-		if (PATTERN.matcher(message).find() && isNotAnswer(message, getConfigStringList(ANSWERS))) {
-			log.info("Contains bodo");
+		String message = getContentDisplay(event);
+		log.debug("Handle message " + message);
+		if (PATTERN.matcher(message).find()) {
+			log.info("Contains regex, answer with random predefined answer");
 			List<String> answers = getConfigStringList(ANSWERS);
 			event.getChannel().sendMessage(getRandomString(answers)).queue();
 		}

@@ -16,12 +16,13 @@ import org.apache.commons.logging.LogFactory;
 import ch.kschmidster.discord.bot.commands.PermitUserCommand;
 import ch.kschmidster.discord.bot.commands.ShutdownCommand;
 import ch.kschmidster.discord.bot.commands.SourceCommand;
-import ch.kschmidster.discord.bot.commands.WerIstBodoCommand;
 import ch.kschmidster.discord.bot.handlers.BotGotMentionedHandler;
 import ch.kschmidster.discord.bot.handlers.DiscordOwnerIsStreamingHandler;
 import ch.kschmidster.discord.bot.handlers.LinkPostedHandler;
 import ch.kschmidster.discord.bot.handlers.NewGuildMemberJoinHandler;
-import ch.kschmidster.discord.bot.handlers.RoleUpgradeHandler.RoleUpgradeHandlerCreator;
+import ch.kschmidster.discord.bot.handlers.RoleAddHandler;
+import ch.kschmidster.discord.bot.handlers.WelcomeMessageHandler;
+import ch.kschmidster.discord.bot.handlers.WhoIsUserHandler;
 import ch.kschmidster.discord.bot.listeners.DiscordBotListenerAdapter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -112,24 +113,24 @@ public final class Main {
 		DiscordBotListenerAdapter myListenerAdapter = DiscordBotListenerAdapter.instance();
 		myListenerAdapter.registerTo(builder);
 		jda.addEventListener(myListenerAdapter);
-		registerHandles(jda, myListenerAdapter, configuration);
+		registerHandles(myListenerAdapter, configuration);
 		registerCommands(myListenerAdapter, configuration);
 	}
 
-	protected static void registerHandles(JDA jda, DiscordBotListenerAdapter myListenerAdapter,
-			Configuration configuration) {
+	protected static void registerHandles(DiscordBotListenerAdapter myListenerAdapter, Configuration configuration) {
 		log.info("Register all handles");
 		myListenerAdapter.registerHandle(new NewGuildMemberJoinHandler(configuration));
 		myListenerAdapter.registerHandle(new LinkPostedHandler(configuration));
+		myListenerAdapter.registerHandle(new WhoIsUserHandler(configuration));
 		myListenerAdapter.registerHandle(new DiscordOwnerIsStreamingHandler(configuration));
 		myListenerAdapter.registerHandle(new BotGotMentionedHandler(configuration));
-		myListenerAdapter.registerHandle(RoleUpgradeHandlerCreator.create(jda, configuration));
+		myListenerAdapter.registerHandle(new RoleAddHandler(configuration));
+		myListenerAdapter.registerHandle(new WelcomeMessageHandler(configuration));
 	}
 
 	protected static void registerCommands(DiscordBotListenerAdapter myListenerAdapter, Configuration configuration) {
 		log.info("Register all commands");
 		myListenerAdapter.registerHandle(new ShutdownCommand(configuration));
-		myListenerAdapter.registerHandle(new WerIstBodoCommand(configuration));
 		myListenerAdapter.registerHandle(new PermitUserCommand(configuration));
 		myListenerAdapter.registerHandle(new SourceCommand(configuration));
 	}

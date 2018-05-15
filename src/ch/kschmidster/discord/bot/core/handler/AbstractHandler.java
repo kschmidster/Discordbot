@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public abstract class AbstractHandler<E extends Event> implements IHandler<E> {
 	private final static Log log = LogFactory.getLog(AbstractHandler.class);
@@ -50,6 +51,14 @@ public abstract class AbstractHandler<E extends Event> implements IHandler<E> {
 				.get();
 	}
 
+	protected String getContentDisplay(MessageReceivedEvent event) {
+		return event.getMessage().getContentDisplay();
+	}
+
+	protected String getEffectiveName(MessageReceivedEvent event) {
+		return event.getMember().getEffectiveName();
+	}
+
 	protected List<String> getConfigStringList(String configuration) {
 		return Arrays.asList(getConfiguration().getStringArray(configuration));
 	}
@@ -73,13 +82,6 @@ public abstract class AbstractHandler<E extends Event> implements IHandler<E> {
 			throw noConfigException;
 		}
 		return configuration;
-	}
-
-	protected boolean isNotAnswer(String message, List<String> answers) {
-		return !answers.stream()//
-				.filter(s -> s.equals(message))//
-				.findFirst()//
-				.isPresent();
 	}
 
 }
