@@ -21,16 +21,8 @@ public class WhoIsUserHandler extends AbstractCommand<MessageReceivedEvent> {
 	private static final String USER = PREFIX_CONFIG + "user";
 	private static final String ANSWERS = PREFIX_CONFIG + "answers";
 
-	private final String REGEX;
-	private final Pattern PATTERN;
-
 	public WhoIsUserHandler(Configuration configuration) {
 		super(MessageReceivedEvent.class, configuration);
-
-		REGEX = getConfigString(USER).trim().chars()//
-				.collect(StringBuilder::new, (sb, i) -> sb.append((char) i).append('+'), StringBuilder::append)//
-				.toString();
-		PATTERN = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
 	}
 
 	@Override
@@ -43,11 +35,18 @@ public class WhoIsUserHandler extends AbstractCommand<MessageReceivedEvent> {
 	public void handleCommand(MessageReceivedEvent event) {
 		String message = getContentDisplay(event);
 		log.debug("Handle message " + message);
-		if (PATTERN.matcher(message).find()) {
+		if (getPattern().matcher(message).find()) {
 			log.info("Contains regex, answer with random predefined answer");
 			List<String> answers = getConfigStringList(ANSWERS);
 			event.getChannel().sendMessage(getRandomString(answers)).queue();
 		}
+	}
+
+	private Pattern getPattern() {
+		String regex = getConfigString(USER).trim().chars()//
+				.collect(StringBuilder::new, (sb, i) -> sb.append((char) i).append('+'), StringBuilder::append)//
+				.toString();
+		return Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 	}
 
 	@Override
