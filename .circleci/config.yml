@@ -40,7 +40,7 @@ jobs:
       # run tests!
       - run: mvn integration-test
       
-      - run: mvn clean verify
+      - run: mvn package
       
       - store_test_results:
           path: target/surefire-reports
