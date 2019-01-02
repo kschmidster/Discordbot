@@ -66,7 +66,7 @@ public class PermitUserCommand extends AbstractCommand<MessageReceivedEvent> {
 			} else {
 				log.info(member.getEffectiveName() + " tried to permit " + split[1] + " to permit to post a link");
 				event.getChannel().sendMessage(event.getMember().getAsMention()
-						+ " du bist nicht berechtig für diesen Command, das können nur Mods.").queue();
+						+ " du bist nicht berechtig für diesen Command, das können nur Space Mods.").queue();
 			}
 		}
 	}

@@ -48,9 +48,8 @@ public class LinkPostedHandler extends AbstractHandler<MessageReceivedEvent> {
 						|| hasNoRole(event.getMember()))) {
 			log.info("Handle message");
 			String content[] = message.split(" ");
-			UrlValidator validator = new UrlValidator();
 			for (String s : content) {
-				if (validator.isValid(s)) {
+				if (UrlValidator.getInstance().isValid(s)) {
 					log.info("Link posted from a Unicorn detected!!! Member: " + event.getMember().getEffectiveName()
 							+ " link: " + s);
 					log.info("Send the violation to the violation channel");

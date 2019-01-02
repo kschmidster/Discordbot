@@ -23,6 +23,7 @@ public class RoleAddHandler extends AbstractHandler<GuildMemberRoleAddEvent> {
 	private final static Log log = LogFactory.getLog(RoleAddHandler.class);
 
 	private static final String CHANNEL = "newguildmemberjoin.channel";
+	private static final String INITIAL_ROLE = "newguildmemberjoin.initialrole";
 
 	private static final int DELAY = 3000;
 
@@ -43,11 +44,15 @@ public class RoleAddHandler extends AbstractHandler<GuildMemberRoleAddEvent> {
 		Role newRole = event.getRoles().get(0);
 		Role highestRole = getHighestRole(event.getMember().getRoles());
 
-		if (newRole.compareTo(highestRole) == 0) {
+		if (!isInitialRole(newRole) && newRole.compareTo(highestRole) == 0) {
 			log.info("New role: " + newRole.getName() + " added to " + event.getMember().getEffectiveName());
 			log.info("Schedule task to gratulate for the new role");
 			scheduleTimerTask(event, newRole);
 		}
+	}
+
+	private boolean isInitialRole(Role newRole) {
+		return getConfigString(INITIAL_ROLE).equals(newRole.getName());
 	}
 
 	private void scheduleTimerTask(GuildMemberRoleAddEvent event, Role newRole) {
